@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { ChevronRight, ChevronDown, Cpu, ShieldAlert, KeyRound, CornerDownRight, SquarePlay } from 'lucide-react';
-import { ProgramNode, ASTNode } from '../compiler/ast';
+import { ChevronRight, ChevronDown, Cpu, KeyRound, CornerDownRight, SquarePlay } from 'lucide-react';
+import type { ProgramNode, ASTNode } from '../compiler/ast';
 
-interface ParseTreeProps {
+interface ParseTreeViewProps {
   ast: ProgramNode | null;
 }
 
-export const ParseTree: React.FC<ParseTreeProps> = ({ ast }) => {
+export const ParseTreeView: React.FC<ParseTreeViewProps> = ({ ast }) => {
   if (!ast) {
     return (
       <div className="flex flex-col items-center justify-center p-8 bg-slate-900/40 rounded-xl border border-slate-800 text-slate-500 font-medium">
@@ -113,9 +113,9 @@ const TreeNode: React.FC<TreeNodeProps> = ({ node }) => {
         onClick={() => hasChildren && setIsOpen(!isOpen)}
       >
         {hasChildren ? (
-          isOpen ? <ChevronDown className="w-4 h-4 text-slate-450" /> : <ChevronRight className="w-4 h-4 text-slate-450" />
+          isOpen ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />
         ) : (
-          <CornerDownRight className="w-3.5 h-3.5 text-slate-650 ml-1.5" />
+          <CornerDownRight className="w-3.5 h-3.5 text-slate-500 ml-1.5" />
         )}
         
         <span className={`px-2 py-0.5 rounded text-xs font-bold font-mono tracking-wide ${getBadgeClass(label)}`}>
@@ -140,7 +140,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({ node }) => {
             <div key={key} className="flex flex-col">
               {/* Optional label for child relations like "then" or "cond" */}
               {(key === 'cond' || key === 'then' || key === 'body') && (
-                <div className="text-[10px] text-slate-550 pl-6 uppercase tracking-wider font-semibold font-mono flex items-center gap-1 mt-1 -mb-1 opacity-70">
+                <div className="text-[10px] text-slate-400 pl-6 uppercase tracking-wider font-semibold font-mono flex items-center gap-1 mt-1 -mb-1 opacity-70">
                   <KeyRound className="w-2.5 h-2.5" />
                   <span>{key === 'cond' ? 'condition' : key === 'then' ? 'then branch' : 'repeat block'}</span>
                 </div>

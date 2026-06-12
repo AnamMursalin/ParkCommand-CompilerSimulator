@@ -14,13 +14,13 @@ export const SymbolTableView: React.FC<SymbolTableViewProps> = ({ symbolTable })
       {/* Symbol Table Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 shadow-sm flex flex-col justify-between">
-          <span className="text-[10px] text-slate-450 uppercase font-bold tracking-wider">Active Zone</span>
+          <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Active Zone</span>
           <span className="text-sm font-bold text-cyan-400 mt-1 truncate">
             {symbolTable.zoneName || 'None'}
           </span>
         </div>
         <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 shadow-sm flex flex-col justify-between">
-          <span className="text-[10px] text-slate-450 uppercase font-bold tracking-wider">Reserved Slots</span>
+          <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Reserved Slots</span>
           <span className="text-sm font-bold text-red-400 mt-1">
             {symbolTable.reservedSlots.size > 0 
               ? Array.from(symbolTable.reservedSlots).join(', ') 
@@ -28,16 +28,16 @@ export const SymbolTableView: React.FC<SymbolTableViewProps> = ({ symbolTable })
           </span>
         </div>
         <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 shadow-sm flex flex-col justify-between">
-          <span className="text-[10px] text-slate-450 uppercase font-bold tracking-wider">Last Gate Status</span>
+          <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Last Gate Status</span>
           <span className={`text-sm font-bold mt-1 uppercase ${
-            symbolTable.gateStatus === 'open' ? 'text-emerald-450' : 'text-slate-450'
+            symbolTable.gateStatus === 'open' ? 'text-emerald-400' : 'text-slate-400'
           }`}>
             {symbolTable.gateStatus.toUpperCase()}
           </span>
         </div>
         <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 shadow-sm flex flex-col justify-between">
-          <span className="text-[10px] text-slate-450 uppercase font-bold tracking-wider">Total Sensor Checks</span>
-          <span className="text-sm font-bold text-yellow-450 mt-1">
+          <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Total Sensor Checks</span>
+          <span className="text-sm font-bold text-yellow-400 mt-1">
             {symbolTable.sensorCheckCount} check{symbolTable.sensorCheckCount !== 1 ? 's' : ''}
           </span>
         </div>

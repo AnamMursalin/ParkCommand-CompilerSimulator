@@ -13,7 +13,6 @@ export interface TestResult {
 export function runCompilerTests(): TestResult[] {
   const results: TestResult[] = [];
 
-  // Helper to run a test
   const addResult = (name: string, phase: 'Lexer' | 'Parser' | 'Semantic', passed: boolean, message?: string) => {
     results.push({
       name,
@@ -23,144 +22,171 @@ export function runCompilerTests(): TestResult[] {
     });
   };
 
-  // --- LEXER TESTS ---
+  // 1. Spaceless Command Keyword checksensor
   try {
-    const lexSource = 'parking begin end open gate reserve slot';
-    const { tokens, errors } = tokenize(lexSource);
-    // Should recognize 7 tokens + EOF = 8
-    const passed = tokens.length === 8 && errors.length === 0;
+    const source = 'parking MallZone begin checksensor end';
+    const { errors } = tokenize(source);
+    const passed = errors.length > 0 && errors.some(e => e.badToken === 'checksensor' && e.suggestion?.includes("check"));
     addResult(
-      'Should correctly tokenize valid keywords and commands',
+      'Should report lexical error with spelling suggestion for merged "checksensor"',
       'Lexer',
       passed,
-      `Expected 8 tokens, got ${tokens.length}. Errors: ${errors.map(e => e.message).join(', ')}`
+      `Expected lexical error suggestion for 'checksensor'. Got errors: ${errors.map(e => e.message).join(', ')}`
     );
   } catch (e: any) {
-    addResult('Tokenization exception test', 'Lexer', false, e.message);
+    addResult('Spaceless checksensor check', 'Lexer', false, e.message);
   }
 
+  // 2. Spaceless if condition ifvehicle
   try {
-    const lexSource = 'parking MallZone $';
-    const { errors } = tokenize(lexSource);
-    const passed = errors.length === 1 && errors[0].message.includes("Unrecognized character '$'");
+    const source = 'parking Airport begin ifvehicle==VIPthenopengate end';
+    const { errors } = tokenize(source);
+    const passed = errors.length > 0 && errors.some(e => e.badToken === 'ifvehicle' && e.suggestion?.includes("if"));
     addResult(
-      'Should report lexical error on illegal character',
+      'Should report lexical error with spacing suggestion for merged condition "ifvehicle"',
       'Lexer',
       passed,
-      'Expected 1 lexical error about unrecognized character.'
+      `Expected lexical error suggestion for 'ifvehicle'. Got errors: ${errors.map(e => e.message).join(', ')}`
     );
   } catch (e: any) {
-    addResult('Tokenization error reporting exception', 'Lexer', false, e.message);
+    addResult('Spaceless ifvehicle check', 'Lexer', false, e.message);
   }
 
-  // --- PARSER TESTS ---
+  // 3. Unrecognized character check
   try {
-    const parseSource = 'parking ZoneA begin open gate end';
-    const { tokens } = tokenize(parseSource);
-    const { ast, errors } = parse(tokens);
-    const passed = ast !== null && ast.zoneId === 'ZoneA' && ast.stmts.length === 1 && errors.length === 0;
+    const source = 'parking MallZone $';
+    const { errors } = tokenize(source);
+    const passed = errors.length > 0 && errors.some(e => e.message.includes("Unrecognized character '$'"));
     addResult(
-      'Should parse standard block with single statement',
+      'Should report lexical error on illegal character "$"',
+      'Lexer',
+      passed,
+      `Expected lexical error for '$'. Got errors: ${errors.map(e => e.message).join(', ')}`
+    );
+  } catch (e: any) {
+    addResult('Illegal character check', 'Lexer', false, e.message);
+  }
+
+  // 4. Valid spaced program compilation
+  try {
+    const source = 'parking MallZone begin if slots > 20 then open gate reserve slot VIP_A1 check sensor release slot VIP_A1 end';
+    const lexResult = tokenize(source);
+    const parseResult = parse(lexResult.tokens);
+    const table = new SymbolTable();
+    const semanticErrors = analyzeSemantics(parseResult.ast, table);
+    const passed = lexResult.errors.length === 0 && parseResult.errors.length === 0 && semanticErrors.length === 0 && parseResult.ast !== null;
+    addResult(
+      'Should compile valid program with correct spacing successfully',
       'Parser',
       passed,
-      `AST is null or malformed. Errors: ${errors.map(e => e.message).join(', ')}`
+      `Expected successful compilation. Lex errors: ${lexResult.errors.length}, Parse errors: ${parseResult.errors.length}, Semantic errors: ${semanticErrors.length}`
     );
   } catch (e: any) {
-    addResult('Parsing validation exception', 'Parser', false, e.message);
+    addResult('Valid program check', 'Parser', false, e.message);
   }
 
+  // 5. Missing begin clause syntax failure
   try {
-    const parseSource = 'parking ZoneA open gate end';
-    const { tokens } = tokenize(parseSource);
-    const { errors } = parse(tokens);
-    // Should fail because of missing begin
-    const passed = errors.length > 0 && errors.some(e => e.message.includes("begin"));
+    const source = 'parking ZoneA open gate end';
+    const lexResult = tokenize(source);
+    const parseResult = parse(lexResult.tokens);
+    const passed = parseResult.errors.length > 0 && parseResult.errors.some(e => e.message.includes("begin"));
     addResult(
-      'Should fail syntax analysis if begin clause is omitted',
+      'Should report syntax error when "begin" is missing after zone identifier',
       'Parser',
       passed,
-      'Expected syntax error about missing begin clause.'
+      `Expected syntax error about missing 'begin'. Got: ${parseResult.errors.map(e => e.message).join(', ')}`
     );
   } catch (e: any) {
-    addResult('Missing begin syntax check exception', 'Parser', false, e.message);
+    addResult('Missing begin check', 'Parser', false, e.message);
   }
 
-  // --- SEMANTIC TESTS ---
+  // 6. Missing end clause syntax failure
   try {
-    const semanticSource = `parking ZoneB begin
-      reserve slot VIP_1
-      reserve slot VIP_1
-    end`;
-    const lex = tokenize(semanticSource);
-    const p = parse(lex.tokens);
-    const table = new SymbolTable();
-    const errors = analyzeSemantics(p.ast, table);
-    const passed = errors.length === 1 && errors[0].message.includes('VIP_1 is already reserved');
+    const source = 'parking ZoneA begin open gate';
+    const lexResult = tokenize(source);
+    const parseResult = parse(lexResult.tokens);
+    const passed = parseResult.errors.length > 0 && parseResult.errors.some(e => e.message.includes("end"));
     addResult(
-      'Should detect duplicate slot reservations semantically',
-      'Semantic',
+      'Should report syntax error when block termination "end" is missing',
+      'Parser',
       passed,
-      `Expected duplicate slot error. Got: ${errors.map(e => e.message).join(', ')}`
+      `Expected syntax error about missing 'end'. Got: ${parseResult.errors.map(e => e.message).join(', ')}`
     );
   } catch (e: any) {
-    addResult('Duplicate reservation check exception', 'Semantic', false, e.message);
+    addResult('Missing end check', 'Parser', false, e.message);
   }
 
+  // 7. Negative repeat count semantic failure
   try {
-    const semanticSource = `parking ZoneC begin
-      release slot STAFF_1
-    end`;
-    const lex = tokenize(semanticSource);
-    const p = parse(lex.tokens);
+    const source = 'parking LoopZone begin repeat -2 times check sensor end';
+    const lexResult = tokenize(source);
+    const parseResult = parse(lexResult.tokens);
     const table = new SymbolTable();
-    const errors = analyzeSemantics(p.ast, table);
-    const passed = errors.length === 1 && errors[0].message.includes('is not reserved');
+    const semanticErrors = analyzeSemantics(parseResult.ast, table);
+    const passed = parseResult.errors.length === 0 && semanticErrors.length > 0 && semanticErrors.some(e => e.message.includes("Found: -2"));
     addResult(
-      'Should detect releasing unreserved slots',
+      'Should parse negative repeat count but reject it semantically (count <= 0)',
       'Semantic',
       passed,
-      `Expected unreserved release error. Got: ${errors.map(e => e.message).join(', ')}`
+      `Expected semantic error for repeat -2. Parse errors: ${parseResult.errors.length}. Semantic errors: ${semanticErrors.map(e => e.message).join(', ')}`
     );
   } catch (e: any) {
-    addResult('Unreserved release check exception', 'Semantic', false, e.message);
+    addResult('Negative repeat check', 'Semantic', false, e.message);
   }
 
+  // 8. Duplicate Slot Reservations semantic failure
   try {
-    const semanticSource = `parking ZoneD begin
-      repeat 0 times check sensor
-    end`;
-    const lex = tokenize(semanticSource);
-    const p = parse(lex.tokens);
+    const source = 'parking MallZone begin reserve slot VIP_A1 reserve slot VIP_A1 end';
+    const lexResult = tokenize(source);
+    const parseResult = parse(lexResult.tokens);
     const table = new SymbolTable();
-    const errors = analyzeSemantics(p.ast, table);
-    const passed = errors.length === 1 && errors[0].message.includes('greater than zero');
+    const semanticErrors = analyzeSemantics(parseResult.ast, table);
+    const passed = semanticErrors.length > 0 && semanticErrors.some(e => e.message.includes("already reserved"));
     addResult(
-      'Should flag repeat count <= 0 semantically',
+      'Should reject duplicate slot reservations semantically',
       'Semantic',
       passed,
-      `Expected loop count error. Got: ${errors.map(e => e.message).join(', ')}`
+      `Expected semantic error about duplicate reservation. Semantic errors: ${semanticErrors.map(e => e.message).join(', ')}`
     );
   } catch (e: any) {
-    addResult('Loop count verification exception', 'Semantic', false, e.message);
+    addResult('Duplicate slot reservation check', 'Semantic', false, e.message);
   }
 
+  // 9. Releasing Unreserved Slot semantic failure
   try {
-    const semanticSource = `parking ZoneE begin
-      emergency visitor override gate
-    end`;
-    const lex = tokenize(semanticSource);
-    const p = parse(lex.tokens);
+    const source = 'parking MallZone begin release slot VIP_A1 end';
+    const lexResult = tokenize(source);
+    const parseResult = parse(lexResult.tokens);
     const table = new SymbolTable();
-    const errors = analyzeSemantics(p.ast, table);
-    const passed = errors.length === 1 && errors[0].message.includes('Only ambulance, police, and firetruck are allowed');
+    const semanticErrors = analyzeSemantics(parseResult.ast, table);
+    const passed = semanticErrors.length > 0 && semanticErrors.some(e => e.message.includes("cannot be released because it is not reserved"));
     addResult(
-      'Should restrict emergency overrides to police/ambulance/firetruck',
+      'Should reject releasing a slot that was never reserved',
       'Semantic',
       passed,
-      `Expected emergency vehicle error. Got: ${errors.map(e => e.message).join(', ')}`
+      `Expected semantic error about releasing unreserved slot. Semantic errors: ${semanticErrors.map(e => e.message).join(', ')}`
     );
   } catch (e: any) {
-    addResult('Emergency type restriction exception', 'Semantic', false, e.message);
+    addResult('Unreserved release check', 'Semantic', false, e.message);
+  }
+
+  // 10. Invalid emergency override category
+  try {
+    const source = 'parking Hospital begin emergency visitor override gate end';
+    const lexResult = tokenize(source);
+    const parseResult = parse(lexResult.tokens);
+    const table = new SymbolTable();
+    const semanticErrors = analyzeSemantics(parseResult.ast, table);
+    const passed = semanticErrors.length > 0 && semanticErrors.some(e => e.message.includes("Invalid emergency vehicle type"));
+    addResult(
+      'Should restrict emergency override categories to ambulance, police, and firetruck',
+      'Semantic',
+      passed,
+      `Expected semantic error about invalid emergency category. Semantic errors: ${semanticErrors.map(e => e.message).join(', ')}`
+    );
+  } catch (e: any) {
+    addResult('Invalid emergency category check', 'Semantic', false, e.message);
   }
 
   return results;

@@ -1,4 +1,4 @@
-import { Token, TokenType } from './lexer';
+import { Token, TokenType, findClosestWord, getSpellingSuggestion } from './lexer';
 import { CompilerError, createCompilerError } from './errors';
 import {
   ASTNode,
@@ -45,9 +45,32 @@ export function parse(tokens: Token[]): { ast: ProgramNode | null; errors: Compi
 
     const expectedStr = value ? `'${value}'` : type;
     const actualStr = t.type === 'EOF' ? 'end of file' : `'${t.value}'`;
-    const message = errorMsg || `Expected ${expectedStr} but found ${actualStr}.`;
+    
+    let suggestMsg = '';
+    let expected = expectedStr;
+    let suggestion = '';
+    if (t.type === 'IDENTIFIER') {
+      const mergeCorrection = getSpellingSuggestion(t.value);
+      if (mergeCorrection) {
+        suggestMsg = ` ${mergeCorrection.suggestion}`;
+        expected = mergeCorrection.expected;
+        suggestion = mergeCorrection.suggestion;
+      } else {
+        const correction = value || findClosestWord(t.value);
+        if (correction) {
+          suggestMsg = ` Did you mean '${correction}'?`;
+          expected = correction;
+          suggestion = `Did you mean '${correction}'?`;
+        }
+      }
+    }
+    
+    const message = errorMsg || `Expected ${expectedStr} but found ${actualStr}.${suggestMsg}`;
     
     const err = createCompilerError('syntax', message, t.line, t.column, t.value.length);
+    err.badToken = t.value === 'EOF' ? 'end of file' : t.value;
+    err.expected = expected;
+    err.suggestion = suggestion || undefined;
     errors.push(err);
     throw new ParseError(message);
   };
@@ -150,9 +173,16 @@ export function parse(tokens: Token[]): { ast: ProgramNode | null; errors: Compi
       } else if (t.type === 'COMMAND' && t.value === 'check') {
         return parseSensorCmd();
       } else {
+        let suggestMsg = '';
+        if (t.type === 'IDENTIFIER') {
+          const correction = findClosestWord(t.value);
+          if (correction) {
+            suggestMsg = ` Did you mean '${correction}'?`;
+          }
+        }
         const err = createCompilerError(
           'syntax',
-          `Unexpected token '${t.value}'. Expected a valid command (open, close, reserve, release, check, repeat, emergency, if) or 'end'.`,
+          `Unexpected token '${t.value}'. Expected a valid command (open, close, reserve, release, check, repeat, emergency, if) or 'end'.${suggestMsg}`,
           t.line,
           t.column,
           t.value.length
@@ -254,10 +284,10 @@ export function parse(tokens: Token[]): { ast: ProgramNode | null; errors: Compi
           column: slotsToken.column,
         };
       } else {
-        // Specific output: Syntax Error at line 2: Expected number after relational operator '>'.
+        // Specific output: Syntax Error: Expected number after relational operator.
         const err = createCompilerError(
           'syntax',
-          `Expected number after relational operator '${opToken.value}'.`,
+          `Expected number after relational operator.`,
           valToken.line,
           valToken.column,
           valToken.value.length
@@ -307,6 +337,11 @@ export function parse(tokens: Token[]): { ast: ProgramNode | null; errors: Compi
 
   const parseRepeatStmt = (): RepeatStatementNode => {
     const repeatToken = next(); // 'repeat'
+    let isNegative = false;
+    if (peek().type === 'RELOP' && peek().value === '-') {
+      next();
+      isNegative = true;
+    }
     const countToken = expect('NUMBER', undefined, "Expected repeat count number after 'repeat'.");
     expect('KEYWORD', 'times', "Expected 'times' after repeat count.");
     const stmt = parseStmt();
@@ -322,9 +357,13 @@ export function parse(tokens: Token[]): { ast: ProgramNode | null; errors: Compi
       errors.push(err);
       throw new ParseError();
     }
+    let count = parseInt(countToken.value, 10);
+    if (isNegative) {
+      count = -count;
+    }
     return {
       type: 'RepeatStatement',
-      count: parseInt(countToken.value, 10),
+      count,
       stmt,
       line: repeatToken.line,
       column: repeatToken.column,

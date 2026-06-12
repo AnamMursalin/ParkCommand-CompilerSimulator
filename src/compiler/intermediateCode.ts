@@ -1,41 +1,140 @@
 import { ProgramNode, ASTNode } from './ast';
 
-export function generateIntermediateCode(ast: ProgramNode | null): string[] {
+export interface IRInstruction {
+  text: string;
+  op: string;
+  args: string[];
+  line: number;
+  sourceCommand: string;
+}
+
+export interface ResolvedIRInstruction extends IRInstruction {
+  targetPc?: number;
+}
+
+export function stringifyNode(node: ASTNode): string {
+  switch (node.type) {
+    case 'GateCommand':
+      return `${node.action} gate`;
+    case 'SlotCommand':
+      return `${node.action} slot ${node.slotId}`;
+    case 'SensorCheck':
+      return 'check sensor';
+    case 'EmergencyOverride':
+      return `emergency ${node.emergencyType} override gate`;
+    case 'IfStatement':
+      return `if ${node.condition.left} ${node.condition.op} ${node.condition.right} then ${stringifyNode(node.thenStmt)}`;
+    case 'RepeatStatement':
+      return `repeat ${node.count} times ${stringifyNode(node.stmt)}`;
+    case 'Condition':
+      return `${node.left} ${node.op} ${node.right}`;
+    default:
+      return '';
+  }
+}
+
+export function resolveLabels(instructions: IRInstruction[]): ResolvedIRInstruction[] {
+  const resolved: ResolvedIRInstruction[] = instructions.map(i => ({ ...i }));
+  const labelMap: { [labelName: string]: number } = {};
+
+  // Pass 1: Collect label indices
+  resolved.forEach((inst, idx) => {
+    if (inst.op === 'LABEL') {
+      const labelName = inst.args[0];
+      labelMap[labelName] = idx;
+    }
+  });
+
+  // Pass 2: Resolve jump targets to absolute instruction indices
+  resolved.forEach((inst) => {
+    if (inst.op === 'GOTO') {
+      const labelName = inst.args[0];
+      if (labelName in labelMap) {
+        inst.targetPc = labelMap[labelName];
+      }
+    } else if (inst.op === 'IF_GOTO') {
+      const labelName = inst.args[3];
+      if (labelName in labelMap) {
+        inst.targetPc = labelMap[labelName];
+      }
+    }
+  });
+
+  return resolved;
+}
+
+export function compileToIRInstructions(ast: ProgramNode | null): ResolvedIRInstruction[] {
   if (!ast) return [];
 
-  const ir: string[] = [];
+  const irInstructions: IRInstruction[] = [];
   let labelIdx = 1;
 
   const nextLabel = () => `L${labelIdx++}`;
 
   const translateStmt = (node: ASTNode) => {
+    const line = node.line;
+    const sourceCommand = stringifyNode(node);
+
     switch (node.type) {
       case 'GateCommand':
-        ir.push(node.action === 'open' ? 'GATE_OPEN' : 'GATE_CLOSE');
+        irInstructions.push({
+          op: node.action === 'open' ? 'GATE_OPEN' : 'GATE_CLOSE',
+          args: [],
+          text: node.action === 'open' ? 'GATE_OPEN' : 'GATE_CLOSE',
+          line,
+          sourceCommand,
+        });
         break;
 
       case 'SlotCommand':
-        ir.push(
-          `${node.action === 'reserve' ? 'RESERVE_SLOT' : 'RELEASE_SLOT'} ${node.slotId}`
-        );
+        irInstructions.push({
+          op: node.action === 'reserve' ? 'RESERVE_SLOT' : 'RELEASE_SLOT',
+          args: [node.slotId],
+          text: `${node.action === 'reserve' ? 'RESERVE_SLOT' : 'RELEASE_SLOT'} ${node.slotId}`,
+          line,
+          sourceCommand,
+        });
         break;
 
       case 'SensorCheck':
-        ir.push('SENSOR_CHECK');
+        irInstructions.push({
+          op: 'SENSOR_CHECK',
+          args: [],
+          text: 'SENSOR_CHECK',
+          line,
+          sourceCommand,
+        });
         break;
 
       case 'EmergencyOverride':
-        ir.push(`EMERGENCY_OVERRIDE ${node.emergencyType} gate`);
+        irInstructions.push({
+          op: 'EMERGENCY_OVERRIDE',
+          args: [node.emergencyType],
+          text: `EMERGENCY_OVERRIDE ${node.emergencyType} gate`,
+          line,
+          sourceCommand,
+        });
         break;
 
       case 'RepeatStatement': {
-        // We look at what statement is inside. E.g. check sensor -> SENSOR_CHECK
-        const innerIR: string[] = [];
-        // Temporarily intercept IR generation for the sub-statement
-        const tempIR = generateSubStmtIR(node.stmt);
-        if (tempIR.length > 0) {
-          ir.push(`REPEAT ${node.count} ${tempIR.join(', ')}`);
-        }
+        irInstructions.push({
+          op: 'REPEAT_START',
+          args: [String(node.count)],
+          text: `REPEAT_START ${node.count}`,
+          line,
+          sourceCommand,
+        });
+
+        // Translate the inner loop statement
+        translateStmt(node.stmt);
+
+        irInstructions.push({
+          op: 'REPEAT_END',
+          args: [],
+          text: `REPEAT_END`,
+          line,
+          sourceCommand,
+        });
         break;
       }
 
@@ -45,14 +144,39 @@ export function generateIntermediateCode(ast: ProgramNode | null): string[] {
         const trueLabel = nextLabel();
         const falseLabel = nextLabel();
 
-        ir.push(`IF ${condStr} GOTO ${trueLabel}`);
-        ir.push(`GOTO ${falseLabel}`);
-        ir.push(`${trueLabel}:`);
-        
-        // Translate the inner then-stmt
+        irInstructions.push({
+          op: 'IF_GOTO',
+          args: [cond.left, cond.op, String(cond.right), trueLabel],
+          text: `IF ${condStr} GOTO ${trueLabel}`,
+          line: cond.line,
+          sourceCommand: `if ${condStr} then ...`,
+        });
+
+        irInstructions.push({
+          op: 'GOTO',
+          args: [falseLabel],
+          text: `GOTO ${falseLabel}`,
+          line: cond.line,
+          sourceCommand: `if ${condStr} then ...`,
+        });
+
+        irInstructions.push({
+          op: 'LABEL',
+          args: [trueLabel],
+          text: `${trueLabel}:`,
+          line: node.thenStmt.line,
+          sourceCommand: sourceCommand,
+        });
+
         translateStmt(node.thenStmt);
-        
-        ir.push(`${falseLabel}:`);
+
+        irInstructions.push({
+          op: 'LABEL',
+          args: [falseLabel],
+          text: `${falseLabel}:`,
+          line: node.thenStmt.line + 1,
+          sourceCommand: sourceCommand,
+        });
         break;
       }
 
@@ -61,35 +185,29 @@ export function generateIntermediateCode(ast: ProgramNode | null): string[] {
     }
   };
 
-  const generateSubStmtIR = (node: ASTNode): string[] => {
-    const subIR: string[] = [];
-    switch (node.type) {
-      case 'GateCommand':
-        subIR.push(node.action === 'open' ? 'GATE_OPEN' : 'GATE_CLOSE');
-        break;
-      case 'SlotCommand':
-        subIR.push(
-          `${node.action === 'reserve' ? 'RESERVE_SLOT' : 'RELEASE_SLOT'} ${node.slotId}`
-        );
-        break;
-      case 'SensorCheck':
-        subIR.push('SENSOR_CHECK');
-        break;
-      case 'EmergencyOverride':
-        subIR.push(`EMERGENCY_OVERRIDE ${node.emergencyType} gate`);
-        break;
-      default:
-        // Complex nesting is supported, but simple commands are standard
-        break;
-    }
-    return subIR;
-  };
+  irInstructions.push({
+    op: 'ZONE',
+    args: [ast.zoneId],
+    text: `ZONE ${ast.zoneId}`,
+    line: ast.line,
+    sourceCommand: `parking ${ast.zoneId} begin`,
+  });
 
-  ir.push(`ZONE ${ast.zoneId}`);
   ast.stmts.forEach((stmt) => {
     translateStmt(stmt);
   });
-  ir.push('END_ZONE');
 
-  return ir;
+  irInstructions.push({
+    op: 'END_ZONE',
+    args: [],
+    text: 'END_ZONE',
+    line: ast.stmts[ast.stmts.length - 1]?.line + 1 || ast.line + 1,
+    sourceCommand: 'end',
+  });
+
+  return resolveLabels(irInstructions);
+}
+
+export function generateIntermediateCode(ast: ProgramNode | null): string[] {
+  return compileToIRInstructions(ast).map(inst => inst.text);
 }

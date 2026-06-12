@@ -6,6 +6,9 @@ export interface CompilerError {
   line: number;
   column: number;
   length?: number;
+  badToken?: string;
+  expected?: string;
+  suggestion?: string;
 }
 
 export function createCompilerError(

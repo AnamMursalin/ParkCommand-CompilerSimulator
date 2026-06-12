@@ -1,14 +1,12 @@
-# ParkCommand: Smart Parking Control Language
+# ParkCommand: Smart Parking Compiler & Simulator
 
-**ParkCommand** is a complete, browser-based compiler simulator designed for a domain-specific smart parking control language. It simulates a compiler pipeline (Lexer, Parser, Semantic Analyzer, Symbol Table, and Intermediate Code Generator) and runs a step-by-step visual parking arena simulation in real time. 
-
-The application is built using **React, TypeScript, Vite, and Tailwind CSS**, running entirely in the client with no backend dependencies.
+**ParkCommand** is a complete compiler construction simulator that compiles a custom domain-specific language for automated parking gates and lot systems. It simulates a 4-phase compiler pipeline and executes visual simulation animations driven directly by the compiled abstract syntax tree.
 
 ---
 
-## 1. Language Grammar (Context-Free Grammar)
+## 1. Domain-Specific Grammar (Context-Free Grammar)
 
-ParkCommand programs govern parking barriers, slots booking, entry sensors, and emergency bypass events. The grammar is defined as follows:
+ParkCommand programs run according to this strict grammar syntax:
 
 ```
 Program       → parking id begin StmtList end
@@ -48,125 +46,60 @@ VehicleType   → VIP | staff | visitor | ambulance | police | firetruck
 
 ---
 
-## 2. Compiler Pipeline & Phases
+## 2. Compiler Pipeline Upgrades
 
-### Phase 1: Lexical Analyzer (`lexer.ts`)
-The Lexer scans the source code character-by-character and transforms it into a structured stream of tokens.
-- **Tokens Recognized**:
-  - `KEYWORD`: `parking`, `begin`, `end`, `if`, `then`, `repeat`, `times`, `emergency`, `override`
-  - `COMMAND`: `open`, `close`, `reserve`, `release`, `check`
-  - `OBJECT`: `gate`, `slot`, `sensor`
-  - `TYPE`: `VIP`, `staff`, `visitor`, `ambulance`, `police`, `firetruck`
-  - `IDENTIFIER`: Arbitrary alphanumeric labels representing zone names or slot names (e.g. `MallZone`, `VIP_A1`).
-  - `NUMBER`: Digits (e.g. `20`, `2`).
-  - `RELOP`: Operators (`>`, `<`, `>=`, `<=`, `==`, `!=`).
-- **Error Detection**: Illegal characters (e.g. `$` or `@`) are flagged with precise line and column offsets.
+### A. Context-Aware Lexer (`lexer.ts`)
+- **Dictionary Check**: Only registers arbitrary keywords and types defined in the grammar.
+- **Context-Aware Identifiers**: Words like `MallZone` or `VIP_A1` are ONLY tokenized as valid `IDENTIFIER`s if they immediately follow declaration keywords (`parking` or `slot`).
+- **Typo Spelling Recommendations**: Any invalid word elsewhere triggers a Lexical Error. It calculates **Levenshtein Distance** against all valid words to suggest corrections (e.g., typing `opne` suggests `Did you mean 'open'?`).
 
-### Phase 2: Parser / Syntax Analyzer (`parser.ts`)
-A recursive-descent parser validates that the token stream conforms to the Context-Free Grammar.
-- **AST Node Output**: Generates an Abstract Syntax Tree (AST) tree containing node structures like `Program`, `GateCommand`, `SlotCommand`, `IfStatement`, `Condition`, `RepeatStatement`, and `EmergencyOverride`.
-- **Error Recovery**: If a syntax error is detected, the parser records the error, synchronizes to the next statement boundaries (e.g. searching for keywords like `end`, `open`, `reserve`), and continues scanning to identify all syntax issues in one run.
+### B. Recursive Parser (`parser.ts`)
+- **Syntax Analysis**: Translates token lists into an Abstract Syntax Tree (AST).
+- **Incomplete Operators**: Catch comparative checks omitting values, raising `Syntax Error: Expected number after relational operator.`
+- **Sync Point Recovery**: If an instruction fails parsing, it synchronization-skips to subsequent statement blocks (`end`, `open`, `reserve`, etc.) to gather all code syntax warnings in a single compile.
 
-### Phase 3: Semantic Analyzer (`semanticAnalyzer.ts`)
-The Semantic Analyzer inspects the AST to ensure the code obeys physical parking rules and priority states.
-- **Semantic Validation Rules**:
-  - **Duplicate Reservations**: A slot cannot be reserved twice without an intermediate release (e.g. `reserve slot VIP_A1` followed by another `reserve slot VIP_A1`).
-  - **Premature Releases**: A slot cannot be released if it is not currently reserved.
-  - **Negative/Zero Repeats**: Repeat loop counts must be strictly positive (`> 0`).
-  - **Invalid Emergency Vehicles**: Bypasses can only be triggered by `ambulance`, `police`, or `firetruck`. Other vehicle types (like `visitor`) trigger a semantic override restriction error.
-  - **Vehicle Categories**: Validates that condition checks only refer to valid categories (`VIP`, `staff`, `visitor`, etc.).
+### C. Semantic Analyzer (`semanticAnalyzer.ts`)
+- **Symbol Records**: Builds a symbol table registering gate states, loops, sensor scans, and slots.
+- **Double-booking safety**: Flags compile errors if slot addresses are reserved twice, or released prior to reservation.
+- **Bypass Priority**: Implements safety bypass checks. If a program attempts to close a gate due to lack of space (`slots == 0`) but receives an `emergency` command, it notes the override priority: `"Emergency override has higher priority, so [vehicle] can open the gate even when parking is full."`
 
-### Phase 4: Symbol Table (`symbolTable.ts`)
-The Symbol Table tracks the static and dynamic state of elements in the compiled scope:
-- Active zone name.
-- Currently booked slots.
-- Gate positioning state (`OPEN`/`CLOSED`).
-- Aggregate entry sensor check counts.
-- Log of vehicle checks and overrides.
-
-### Phase 5: Intermediate Code Generator (`intermediateCode.ts`)
-Translates the verified AST into a simplified, flat assembly-like **Three-Address Code (3AC) Intermediate Representation (IR)**.
-- Compiles conditional statements (`if`) into GOTO branches with incrementing labels (`L1:`, `L2:`, etc.).
-- Compiles loops into single instruction registers.
-- Example:
-  ```assembly
-  ZONE MallZone
-  IF slots > 20 GOTO L1
-  GOTO L2
-  L1: GATE_OPEN
-  L2:
-  END_ZONE
-  ```
+### D. Intermediate Code Generator (`intermediateCode.ts`)
+- Flattens the AST into 3-Address GOTO branches with sequentially incrementing labels.
+- Formats loop structures using `REPEAT_START [N]` and `REPEAT_END` tags.
 
 ---
 
-## 3. Simulation Engine & Visualization (`simulator.ts`)
+## 3. Top-Down Visual Arena & Timeline
 
-Once code compiles successfully, the simulator parses the AST against the **Live Dashboard Parameters**:
-1. **Available Slots slider**: Represents the real-time slot occupancy level.
-2. **Approaching Vehicle dropdown**: Selects the type of car sitting on the entry road.
+### Visual Elements:
+- **Top-Down Graphics**: Renders a styled asphalt entrance and exit road, complete with lane markings.
+- **Striped Gate Barriers**: Gate barrier pivot arms rotate upwards smoothly via CSS transitions.
+- **Traffic Light Indicators**: Auto-glows red when closed, green when open.
+- **Sensors Radar Waves**: The center sensor tower emits concentric ripple ring animations when polled.
+- **Top-Down Vehicles**: Cars are rendered as vector chassis (Red Sirens for Ambulances, Navy Blue decals for Police patrols, Royal Purple frames with gold rims for VIPs, and silver visitor cars).
+- **Evaluation Popup Cards**: Displays condition comparison diagnostics in real-time above the gate.
 
-### Visual Animation Behaviors:
-- **Gate Barrier**: A striped gate arm rotates smoothly upward (`-75deg`) or flat (`0deg`) using CSS transitions.
-- **Pulsing Sensor**: The scanner ring blinks and pulses cyan when a `check sensor` instruction runs.
-- **Vehicles**: Custom vehicle cards slide dynamically towards the gate, flashing emergency sirens for `ambulance`, `police`, or `firetruck`. If the gate is open, they drive through and fade away.
-- **Slots Grid**: A graphical representation of 6 parking slots (`VIP_A1`, `VIP_A2`, `STAFF_B1`, `STAFF_B2`, `VISITOR_C1`, `VISITOR_C2`) showing car silhouettes and red highlight indicators when reserved.
-- **Emergency overrides**: Sirens blink and a red alert banner announces priority bypasses.
-
----
-
-## 4. Sample Code Presets
-
-### Valid Automation Script:
-```parking
-parking MallZone begin
-if slots > 20 then open gate
-reserve slot VIP_A1
-reserve slot STAFF_B2
-repeat 2 times check sensor
-if vehicle == VIP then open gate
-emergency ambulance override gate
-release slot VIP_A1
-close gate
-end
-```
-
-### Invalid Error Cases:
-- **Missing Block Begin**:
-  ```parking
-  parking MallZone
-  open gate
-  end
-  ```
-  *Error output: Syntax Error at line 1, column 18: Expected 'begin' after parking zone name.*
-
-- **Duplicate Slot booking**:
-  ```parking
-  parking PlazaZone begin
-  reserve slot STAFF_B2
-  reserve slot STAFF_B2
-  end
-  ```
-  *Error output: Semantic Error at line 3: Slot STAFF_B2 is already reserved.*
+### Interactive Timelines:
+- Displays chronological step nodes horizontally below the canvas.
+- Automatically slides and glows-highlights the current execution node.
+- Highlights the corresponding line of source code in the IDE editor in sync.
 
 ---
 
-## 5. Development & Startup Commands
+## 4. Run & Build Commands
 
-Follow these steps to run the compiler simulator locally:
-
-### 1. Install Dependencies
+### Setup Node Modules:
 ```bash
 npm install
 ```
 
-### 2. Launch Local Dev Server
+### Dev Server:
 ```bash
 npm run dev
 ```
 
-### 3. Compile for Production
+### Production Build:
 ```bash
 npm run build
 ```
-The compiled static assets will be outputted to the `dist/` directory, ready to be hosted on Netlify, GitHub Pages, or any static provider.
+The compiled bundle will output to the local `dist/` folder.

@@ -20,7 +20,7 @@ export const IntermediateCodeView: React.FC<IntermediateCodeViewProps> = ({ ir }
       const parts = line.split(':');
       return (
         <span>
-          <span className="text-yellow-450 font-bold">{parts[0]}:</span>
+          <span className="text-yellow-400 font-bold">{parts[0]}:</span>
           <span className="text-slate-300">{parts.slice(1).join(':')}</span>
         </span>
       );
@@ -64,7 +64,7 @@ export const IntermediateCodeView: React.FC<IntermediateCodeViewProps> = ({ ir }
     }
 
     if (line.startsWith('GATE_OPEN') || line.startsWith('GATE_CLOSE')) {
-      return <span className="text-emerald-450 font-bold">{line}</span>;
+      return <span className="text-emerald-400 font-bold">{line}</span>;
     }
 
     if (line.startsWith('EMERGENCY_OVERRIDE')) {
@@ -123,8 +123,8 @@ export const IntermediateCodeView: React.FC<IntermediateCodeViewProps> = ({ ir }
         ) : (
           <div className="flex flex-col">
             {ir.map((line, idx) => (
-              <div key={idx} className="flex hover:bg-slate-850/20 px-2 py-0.5 rounded transition-colors group">
-                <span className="w-8 select-none text-slate-655 text-xs text-right pr-3 font-mono opacity-50 group-hover:opacity-100">
+              <div key={idx} className="flex hover:bg-slate-800/20 px-2 py-0.5 rounded transition-colors group">
+                <span className="w-8 select-none text-slate-500 text-xs text-right pr-3 font-mono opacity-50 group-hover:opacity-100">
                   {idx + 1}
                 </span>
                 <span className="flex-1 whitespace-pre pl-1">

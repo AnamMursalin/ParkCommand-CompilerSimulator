@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Play, CheckSquare, ShieldCheck, AlertTriangle } from 'lucide-react';
-import { runCompilerTests, TestResult } from '../compiler/compiler.test';
+import { Play, CheckSquare } from 'lucide-react';
+import { runCompilerTests, type TestResult } from '../compiler/compiler.test';
 
 export const TestSuiteView: React.FC = () => {
   const [testResults, setTestResults] = useState<TestResult[]>([]);

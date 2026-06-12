@@ -68,7 +68,7 @@ export const SimulationLog: React.FC<SimulationLogProps> = ({ steps, currentStep
                           {step.sourceCommand}
                         </span>
                         {isActive && step.explanation && (
-                          <div className="text-[10px] text-cyan-455 font-semibold font-sans flex items-start gap-1 mt-0.5 py-0.5 px-1 bg-cyan-950/80 rounded border border-cyan-900/30">
+                          <div className="text-[10px] text-cyan-400 font-semibold font-sans flex items-start gap-1 mt-0.5 py-0.5 px-1 bg-cyan-950/80 rounded border border-cyan-900/30">
                             <CornerDownRight className="w-3 h-3 mt-0.5 flex-shrink-0" />
                             <span>{step.explanation}</span>
                           </div>

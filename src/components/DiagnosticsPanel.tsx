@@ -1,13 +1,13 @@
 import React from 'react';
-import { AlertCircle, Terminal, HelpCircle, CheckCircle } from 'lucide-react';
-import { CompilerError } from '../compiler/errors';
+import { AlertCircle, Terminal, CheckCircle } from 'lucide-react';
+import type { CompilerError } from '../compiler/errors';
 
-interface ErrorPanelProps {
+interface DiagnosticsPanelProps {
   errors: CompilerError[];
   isCompiled: boolean;
 }
 
-export const ErrorPanel: React.FC<ErrorPanelProps> = ({ errors, isCompiled }) => {
+export const DiagnosticsPanel: React.FC<DiagnosticsPanelProps> = ({ errors, isCompiled }) => {
   const getErrorTitle = (type: string) => {
     switch (type) {
       case 'lexical': return 'Lexical Error';
@@ -38,7 +38,7 @@ export const ErrorPanel: React.FC<ErrorPanelProps> = ({ errors, isCompiled }) =>
       <div className="p-4 flex-1 overflow-y-auto max-h-[300px]">
         {errors.length === 0 ? (
           isCompiled ? (
-            <div className="flex flex-col items-center justify-center py-6 text-emerald-450 gap-2">
+            <div className="flex flex-col items-center justify-center py-6 text-emerald-400 gap-2">
               <CheckCircle className="w-8 h-8 text-emerald-500" />
               <span className="font-semibold text-center text-sm">
                 Compilation Successful: 0 errors detected.
@@ -67,6 +67,28 @@ export const ErrorPanel: React.FC<ErrorPanelProps> = ({ errors, isCompiled }) =>
                     {getErrorTitle(err.type)} at Line {err.line}, Column {err.column}
                   </div>
                   <div className="text-slate-200 leading-5 text-sm">{err.message}</div>
+                  {(err.badToken || err.expected || err.suggestion) && (
+                    <div className="mt-2 pt-2 border-t border-slate-800/40 text-xs flex flex-col gap-1 text-slate-400">
+                      {err.badToken && (
+                        <div>
+                          <span className="text-slate-500 font-semibold uppercase tracking-wider">Bad Token:</span>{' '}
+                          <code className="bg-slate-900 px-1 py-0.5 rounded text-rose-400 font-bold">{err.badToken}</code>
+                        </div>
+                      )}
+                      {err.expected && (
+                        <div>
+                          <span className="text-slate-500 font-semibold uppercase tracking-wider">Expected:</span>{' '}
+                          <code className="bg-slate-900 px-1 py-0.5 rounded text-cyan-400 font-bold">{err.expected}</code>
+                        </div>
+                      )}
+                      {err.suggestion && (
+                        <div>
+                          <span className="text-slate-500 font-semibold uppercase tracking-wider">Suggestion:</span>{' '}
+                          <span className="text-slate-300 font-medium">{err.suggestion}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
