@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Eye, ArrowRight, CornerDownRight } from 'lucide-react';
+import { ArrowRight, CornerDownRight } from 'lucide-react';
 import { SimulationStep } from '../compiler/simulator';
 
 interface SimulationLogProps {
@@ -21,21 +21,21 @@ export const SimulationLog: React.FC<SimulationLogProps> = ({ steps, currentStep
   }, [currentStepIndex]);
 
   return (
-    <div className="flex flex-col h-full bg-slate-900/40 rounded-xl border border-slate-800 overflow-hidden" ref={tableRef}>
-      <div className="overflow-x-auto max-h-[300px]">
+    <div className="flex flex-col h-full bg-white rounded-xl border border-slate-700 overflow-hidden" ref={tableRef}>
+      <div className="overflow-x-auto max-h-[350px]">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-slate-950 text-slate-400 text-xs font-semibold uppercase tracking-wider border-b border-slate-800">
-              <th className="py-2.5 px-4 font-mono w-16">Step</th>
-              <th className="py-2.5 px-4">Source Instruction</th>
-              <th className="py-2.5 px-4">Action</th>
-              <th className="py-2.5 px-4">Result Status</th>
+            <tr className="bg-slate-50 text-slate-800 text-sm font-semibold uppercase tracking-wider border-b border-slate-300">
+              <th className="py-3.5 px-5 font-mono w-20">Step</th>
+              <th className="py-3.5 px-5">Source Instruction</th>
+              <th className="py-3.5 px-5">Action</th>
+              <th className="py-3.5 px-5">Result Status</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-850 text-sm font-mono">
+          <tbody className="divide-y divide-slate-300 text-base font-mono">
             {steps.length === 0 ? (
               <tr>
-                <td colSpan={4} className="py-8 text-center text-slate-500 font-medium">
+                <td colSpan={4} className="py-10 text-center text-slate-600 font-medium">
                   Simulation log is empty. Compile a valid program and run the simulation.
                 </td>
               </tr>
@@ -48,49 +48,49 @@ export const SimulationLog: React.FC<SimulationLogProps> = ({ steps, currentStep
                     data-active={isActive}
                     className={`transition-all duration-300 ${
                       isActive
-                        ? 'bg-cyan-950/45 text-cyan-200 font-bold border-y border-cyan-800/40 shadow-inner'
-                        : 'hover:bg-slate-850/30 text-slate-300'
+                        ? 'bg-cyan-50 text-cyan-900 font-bold border-y border-cyan-300 shadow-inner'
+                        : 'hover:bg-slate-50 text-slate-800'
                     }`}
                   >
-                    <td className="py-2.5 px-4 font-mono">
+                    <td className="py-3.5 px-5 font-mono">
                       {isActive ? (
-                        <span className="flex items-center gap-1 text-cyan-400">
-                          <ArrowRight className="w-3.5 h-3.5 animate-pulse" />
+                        <span className="flex items-center gap-2 text-cyan-700">
+                          <ArrowRight className="w-4.5 h-4.5 animate-pulse" />
                           {idx}
                         </span>
                       ) : (
-                        <span className="text-slate-500 text-xs">{idx}</span>
+                        <span className="text-slate-600 text-sm">{idx}</span>
                       )}
                     </td>
-                    <td className="py-2.5 px-4">
-                      <div className="flex flex-col gap-0.5">
-                        <span className={isActive ? 'text-slate-100' : 'text-slate-350'}>
+                    <td className="py-3.5 px-5">
+                      <div className="flex flex-col gap-1">
+                        <span className={isActive ? 'text-slate-900' : 'text-slate-800'}>
                           {step.sourceCommand}
                         </span>
                         {isActive && step.explanation && (
-                          <div className="text-[10px] text-cyan-400 font-semibold font-sans flex items-start gap-1 mt-0.5 py-0.5 px-1 bg-cyan-950/80 rounded border border-cyan-900/30">
-                            <CornerDownRight className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                          <div className="text-sm text-cyan-800 font-semibold font-sans flex items-start gap-2 mt-1 py-1 px-2 bg-cyan-100 rounded border border-cyan-300">
+                            <CornerDownRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
                             <span>{step.explanation}</span>
                           </div>
                         )}
                       </div>
                     </td>
-                    <td className="py-2.5 px-4">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight ${
+                    <td className="py-3.5 px-5">
+                      <span className={`px-3 py-1.5 rounded text-sm font-bold uppercase tracking-tight ${
                         step.action.toLowerCase().includes('emergency')
-                          ? 'bg-red-950/80 text-red-400 border border-red-800/40 animate-pulse'
+                          ? 'bg-red-100 text-red-800 border border-red-300 animate-pulse'
                           : step.action.toLowerCase().includes('open')
-                          ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-800/40'
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                           : step.action.toLowerCase().includes('close')
-                          ? 'bg-slate-900 text-slate-400 border border-slate-750'
+                          ? 'bg-slate-100 text-slate-800 border border-slate-300'
                           : step.action.toLowerCase().includes('reserve')
-                          ? 'bg-indigo-950/80 text-indigo-400 border border-indigo-800/40'
-                          : 'bg-cyan-950/80 text-cyan-400 border border-cyan-800/40'
+                          ? 'bg-indigo-100 text-indigo-800 border border-indigo-300'
+                          : 'bg-cyan-100 text-cyan-800 border border-cyan-300'
                       }`}>
                         {step.action}
                       </span>
                     </td>
-                    <td className="py-2.5 px-4 text-xs font-semibold text-slate-350">
+                    <td className="py-3.5 px-5 text-sm font-semibold text-slate-700">
                       {step.status}
                     </td>
                   </tr>

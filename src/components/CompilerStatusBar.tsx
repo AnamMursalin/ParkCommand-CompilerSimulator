@@ -1,5 +1,5 @@
 import React from 'react';
-import { Cpu, ShieldCheck, CheckSquare, Settings2, ShieldX } from 'lucide-react';
+import { ShieldCheck, ShieldX } from 'lucide-react';
 
 export type CompileProgressState = 'idle' | 'lexical' | 'syntax' | 'semantic' | 'ir' | 'success' | 'failed';
 
@@ -15,35 +15,35 @@ export const CompilerStatusBar: React.FC<CompilerStatusBarProps> = ({
   errorMessageCount,
 }) => {
   const getPhaseStatus = (phase: 'lexer' | 'parser' | 'semantic' | 'ir') => {
-    if (compileState === 'idle') return { label: 'Idle', color: 'bg-slate-800 text-slate-400 border-slate-700/50' };
+    if (compileState === 'idle') return { label: 'Idle', color: 'bg-slate-100 text-slate-600 border-slate-200' };
 
     switch (phase) {
       case 'lexer':
-        if (compileState === 'lexical') return { label: 'Scanning...', color: 'bg-cyan-950 text-cyan-400 border-cyan-800 animate-pulse font-bold' };
-        if (failedPhase === 'lexer') return { label: 'Failed', color: 'bg-red-950 text-red-400 border-red-900 font-bold' };
-        return { label: 'Passed', color: 'bg-emerald-950 text-emerald-400 border-emerald-900 font-bold' };
+        if (compileState === 'lexical') return { label: 'Scanning...', color: 'bg-cyan-50 text-cyan-600 border-cyan-200 animate-pulse font-bold' };
+        if (failedPhase === 'lexer') return { label: 'Failed', color: 'bg-red-50 text-red-600 border-red-200 font-bold' };
+        return { label: 'Passed', color: 'bg-emerald-50 text-emerald-600 border-emerald-200 font-bold' };
 
       case 'parser':
-        if (compileState === 'lexical') return { label: 'Idle', color: 'bg-slate-800 text-slate-400 border-slate-700/50' };
-        if (compileState === 'syntax') return { label: 'Parsing...', color: 'bg-cyan-950 text-cyan-400 border-cyan-800 animate-pulse font-bold' };
-        if (failedPhase === 'lexer') return { label: 'Blocked', color: 'bg-slate-900 text-slate-600 border-slate-800' };
-        if (failedPhase === 'parser') return { label: 'Failed', color: 'bg-red-950 text-red-400 border-red-900 font-bold' };
-        return { label: 'Passed', color: 'bg-emerald-950 text-emerald-400 border-emerald-900 font-bold' };
+        if (compileState === 'lexical') return { label: 'Idle', color: 'bg-slate-100 text-slate-600 border-slate-200' };
+        if (compileState === 'syntax') return { label: 'Parsing...', color: 'bg-cyan-50 text-cyan-600 border-cyan-200 animate-pulse font-bold' };
+        if (failedPhase === 'lexer') return { label: 'Blocked', color: 'bg-slate-100 text-slate-500 border-slate-200' };
+        if (failedPhase === 'parser') return { label: 'Failed', color: 'bg-red-50 text-red-600 border-red-200 font-bold' };
+        return { label: 'Passed', color: 'bg-emerald-50 text-emerald-600 border-emerald-200 font-bold' };
 
       case 'semantic':
-        if (compileState === 'lexical' || compileState === 'syntax') return { label: 'Idle', color: 'bg-slate-800 text-slate-400 border-slate-700/50' };
-        if (compileState === 'semantic') return { label: 'Analyzing...', color: 'bg-cyan-950 text-cyan-400 border-cyan-800 animate-pulse font-bold' };
-        if (failedPhase === 'lexer' || failedPhase === 'parser') return { label: 'Blocked', color: 'bg-slate-900 text-slate-600 border-slate-800' };
-        if (failedPhase === 'semantic') return { label: 'Failed', color: 'bg-red-950 text-red-400 border-red-900 font-bold' };
-        return { label: 'Passed', color: 'bg-emerald-950 text-emerald-400 border-emerald-900 font-bold' };
+        if (compileState === 'lexical' || compileState === 'syntax') return { label: 'Idle', color: 'bg-slate-100 text-slate-600 border-slate-200' };
+        if (compileState === 'semantic') return { label: 'Analyzing...', color: 'bg-cyan-50 text-cyan-600 border-cyan-200 animate-pulse font-bold' };
+        if (failedPhase === 'lexer' || failedPhase === 'parser') return { label: 'Blocked', color: 'bg-slate-100 text-slate-500 border-slate-200' };
+        if (failedPhase === 'semantic') return { label: 'Failed', color: 'bg-red-50 text-red-600 border-red-200 font-bold' };
+        return { label: 'Passed', color: 'bg-emerald-50 text-emerald-600 border-emerald-200 font-bold' };
 
       case 'ir':
         if (compileState === 'lexical' || compileState === 'syntax' || compileState === 'semantic') {
-          return { label: 'Idle', color: 'bg-slate-800 text-slate-400 border-slate-700/50' };
+          return { label: 'Idle', color: 'bg-slate-100 text-slate-600 border-slate-200' };
         }
-        if (compileState === 'ir') return { label: 'Generating...', color: 'bg-cyan-950 text-cyan-400 border-cyan-800 animate-pulse font-bold' };
-        if (failedPhase !== null) return { label: 'Not Generated', color: 'bg-slate-900 text-slate-600 border-slate-800' };
-        return { label: 'Generated', color: 'bg-purple-950 text-purple-400 border-purple-900 font-bold' };
+        if (compileState === 'ir') return { label: 'Generating...', color: 'bg-cyan-50 text-cyan-600 border-cyan-200 animate-pulse font-bold' };
+        if (failedPhase !== null) return { label: 'Not Generated', color: 'bg-slate-100 text-slate-500 border-slate-200' };
+        return { label: 'Generated', color: 'bg-purple-50 text-purple-600 border-purple-200 font-bold' };
     }
   };
 
@@ -66,78 +66,77 @@ export const CompilerStatusBar: React.FC<CompilerStatusBarProps> = ({
   const irStatus = getPhaseStatus('ir');
 
   return (
-    <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl shadow-md w-full flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="bg-white border border-slate-700 p-6 rounded-xl shadow-sm w-full flex flex-col md:flex-row md:items-center justify-between gap-6">
       {/* Compiler Progress Bar */}
-      <div className="flex-1 flex flex-col gap-2">
-        <div className="flex justify-between items-center text-xs">
-          <span className="text-slate-400 font-semibold flex items-center gap-1.5">
-            <Cpu className="w-4 h-4 text-cyan-400" />
+      <div className="flex-1 flex flex-col gap-3">
+        <div className="flex justify-between items-center text-sm">
+          <span className="text-slate-700 font-semibold">
             Compiler Pipeline Status
           </span>
-          <span className="font-mono text-cyan-400 font-bold">
+          <span className="font-mono text-cyan-700 font-bold text-base">
             {compileState === 'success' ? '100% COMPLETE' : compileState === 'failed' ? 'COMPILATION FAILURE' : `${getProgressPercentage()}%`}
           </span>
         </div>
         {/* Loading track */}
-        <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800/80">
+        <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden border border-slate-300">
           <div
             style={{ width: `${getProgressPercentage()}%` }}
             className={`h-full transition-all duration-300 rounded-full ${
-              compileState === 'failed' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]'
+              compileState === 'failed' ? 'bg-red-600' : 'bg-cyan-600'
             }`}
           />
         </div>
       </div>
 
       {/* Grid of Badges */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-4">
         {/* Lexer */}
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-950 rounded-lg border border-slate-800/60 shadow-sm">
-          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Lexer:</span>
-          <span className={`text-[10px] px-2 py-0.5 rounded border uppercase font-bold font-mono tracking-wide ${lexerStatus.color}`}>
+        <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-lg border border-slate-300 shadow-sm">
+          <span className="text-xs text-slate-600 font-bold uppercase tracking-wider">Lexer:</span>
+          <span className={`text-xs px-3 py-1 rounded border uppercase font-bold font-mono tracking-wide ${lexerStatus.color}`}>
             {lexerStatus.label}
           </span>
         </div>
 
         {/* Parser */}
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-950 rounded-lg border border-slate-800/60 shadow-sm">
-          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Parser:</span>
-          <span className={`text-[10px] px-2 py-0.5 rounded border uppercase font-bold font-mono tracking-wide ${parserStatus.color}`}>
+        <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-lg border border-slate-300 shadow-sm">
+          <span className="text-xs text-slate-600 font-bold uppercase tracking-wider">Parser:</span>
+          <span className={`text-xs px-3 py-1 rounded border uppercase font-bold font-mono tracking-wide ${parserStatus.color}`}>
             {parserStatus.label}
           </span>
         </div>
 
         {/* Semantic */}
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-950 rounded-lg border border-slate-800/60 shadow-sm">
-          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Semantics:</span>
-          <span className={`text-[10px] px-2 py-0.5 rounded border uppercase font-bold font-mono tracking-wide ${semanticStatus.color}`}>
+        <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-lg border border-slate-300 shadow-sm">
+          <span className="text-xs text-slate-600 font-bold uppercase tracking-wider">Semantics:</span>
+          <span className={`text-xs px-3 py-1 rounded border uppercase font-bold font-mono tracking-wide ${semanticStatus.color}`}>
             {semanticStatus.label}
           </span>
         </div>
 
         {/* IR Generator */}
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-950 rounded-lg border border-slate-800/60 shadow-sm">
-          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">IR Code:</span>
-          <span className={`text-[10px] px-2 py-0.5 rounded border uppercase font-bold font-mono tracking-wide ${irStatus.color}`}>
+        <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-lg border border-slate-300 shadow-sm">
+          <span className="text-xs text-slate-600 font-bold uppercase tracking-wider">IR Code:</span>
+          <span className={`text-xs px-3 py-1 rounded border uppercase font-bold font-mono tracking-wide ${irStatus.color}`}>
             {irStatus.label}
           </span>
         </div>
 
         {/* Master Output Badge */}
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-950 rounded-lg border border-slate-800/60 shadow-sm">
-          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Build:</span>
+        <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-lg border border-slate-300 shadow-sm">
+          <span className="text-xs text-slate-600 font-bold uppercase tracking-wider">Build:</span>
           {compileState === 'success' ? (
-            <span className="text-[10px] px-2 py-0.5 rounded border border-emerald-900 bg-emerald-950 text-emerald-400 uppercase font-bold tracking-wider animate-bounce flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5" />
+            <span className="text-xs px-3 py-1 rounded border border-emerald-300 bg-emerald-50 text-emerald-700 uppercase font-bold tracking-wider animate-bounce flex items-center gap-1">
+              <ShieldCheck className="w-4 h-4" />
               Ready
             </span>
           ) : compileState === 'failed' ? (
-            <span className="text-[10px] px-2 py-0.5 rounded border border-red-900 bg-red-950 text-red-400 uppercase font-bold tracking-wider flex items-center gap-1">
-              <ShieldX className="w-3.5 h-3.5" />
+            <span className="text-xs px-3 py-1 rounded border border-red-300 bg-red-50 text-red-700 uppercase font-bold tracking-wider flex items-center gap-1">
+              <ShieldX className="w-4 h-4" />
               Blocked ({errorMessageCount})
             </span>
           ) : (
-            <span className="text-[10px] px-2 py-0.5 rounded border border-slate-800 bg-slate-900 text-slate-500 uppercase font-bold tracking-wider">
+            <span className="text-xs px-3 py-1 rounded border border-slate-300 bg-slate-100 text-slate-700 uppercase font-bold tracking-wider">
               Idle
             </span>
           )}

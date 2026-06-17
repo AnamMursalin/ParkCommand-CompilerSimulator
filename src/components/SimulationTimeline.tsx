@@ -29,29 +29,29 @@ export const SimulationTimeline: React.FC<SimulationTimelineProps> = ({
 
   const getStepIcon = (action: string) => {
     const act = action.toLowerCase();
-    if (act.includes('gate')) return <BadgeCheck className="w-4 h-4 text-emerald-400" />;
-    if (act.includes('slot')) return <KeyRound className="w-4 h-4 text-indigo-400" />;
-    if (act.includes('sensor')) return <Radio className="w-4 h-4 text-cyan-400" />;
-    if (act.includes('emergency')) return <ShieldAlert className="w-4 h-4 text-red-400 animate-pulse" />;
-    return <Activity className="w-4 h-4 text-slate-400" />;
+    if (act.includes('gate')) return <BadgeCheck className="w-4 h-4 text-emerald-600" />;
+    if (act.includes('slot')) return <KeyRound className="w-4 h-4 text-indigo-600" />;
+    if (act.includes('sensor')) return <Radio className="w-4 h-4 text-cyan-600" />;
+    if (act.includes('emergency')) return <ShieldAlert className="w-4 h-4 text-red-600 animate-pulse" />;
+    return <Activity className="w-4 h-4 text-slate-500" />;
   };
 
   const getCardBorder = (isActive: boolean, action: string) => {
-    if (!isActive) return 'border-slate-800 bg-slate-950/40 opacity-50 text-slate-400';
+    if (!isActive) return 'border-slate-200 bg-slate-50 opacity-50 text-slate-500';
     
     const act = action.toLowerCase();
-    if (act.includes('emergency')) return 'border-red-500 bg-red-950/20 text-red-200 shadow-[0_0_15px_rgba(239,68,68,0.25)]';
-    if (act.includes('gate')) return 'border-emerald-500 bg-emerald-950/25 text-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.25)]';
-    if (act.includes('slot')) return 'border-indigo-500 bg-indigo-950/20 text-indigo-200 shadow-[0_0_15px_rgba(99,102,241,0.25)]';
-    return 'border-cyan-500 bg-cyan-950/20 text-cyan-200 shadow-[0_0_15px_rgba(6,182,212,0.25)]';
+    if (act.includes('emergency')) return 'border-red-500 bg-red-50 text-red-700 shadow-[0_0_15px_rgba(239,68,68,0.15)]';
+    if (act.includes('gate')) return 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-[0_0_15px_rgba(16,185,129,0.15)]';
+    if (act.includes('slot')) return 'border-indigo-500 bg-indigo-50 text-indigo-700 shadow-[0_0_15px_rgba(99,102,241,0.15)]';
+    return 'border-cyan-500 bg-cyan-50 text-cyan-700 shadow-[0_0_15px_rgba(6,182,212,0.15)]';
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 shadow-md flex flex-col gap-2.5">
-      <div className="flex items-center justify-between text-xs text-slate-400 font-bold uppercase tracking-wider border-b border-slate-800 pb-1.5 px-1">
+    <div className="bg-white border border-slate-700 rounded-xl p-5 shadow-md flex flex-col gap-3">
+      <div className="flex items-center justify-between text-sm text-slate-700 font-bold uppercase tracking-wider border-b border-slate-300 pb-2 px-1">
         <span>Execution Steps Timeline</span>
         {steps.length > 0 && (
-          <span className="font-mono text-[10px] text-cyan-400">
+          <span className="font-mono text-xs text-cyan-700">
             Step {currentStepIndex} of {steps.length - 1}
           </span>
         )}
@@ -59,10 +59,10 @@ export const SimulationTimeline: React.FC<SimulationTimelineProps> = ({
 
       <div
         ref={containerRef}
-        className="flex items-center gap-3.5 overflow-x-auto py-2 px-1 select-none scroll-smooth min-h-[90px]"
+        className="flex items-center gap-4 overflow-x-auto py-3 px-1 select-none scroll-smooth min-h-[110px]"
       >
         {steps.length === 0 ? (
-          <div className="w-full text-center py-4 text-xs text-slate-500 font-semibold font-sans">
+          <div className="w-full text-center py-6 text-sm text-slate-600 font-semibold font-sans">
             Simulation timeline idle. Compile a valid program to generate execution step cards.
           </div>
         ) : (
@@ -72,35 +72,35 @@ export const SimulationTimeline: React.FC<SimulationTimelineProps> = ({
               <React.Fragment key={idx}>
                 {/* Connecting Arrow */}
                 {idx > 0 && (
-                  <ArrowRight className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-cyan-400 animate-pulse' : 'text-slate-750'}`} />
+                  <ArrowRight className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-cyan-700 animate-pulse' : 'text-slate-400'}`} />
                 )}
 
                 {/* Step Card */}
                 <div
                   data-active={isActive}
-                  className={`flex-shrink-0 w-52 p-2.5 rounded-lg border flex flex-col gap-1 transition-all duration-300 ${getCardBorder(
+                  className={`flex-shrink-0 w-64 p-3.5 rounded-lg border flex flex-col gap-2 transition-all duration-300 ${getCardBorder(
                     isActive,
                     step.action
                   )}`}
                 >
-                  <div className="flex justify-between items-center text-[10px] font-bold tracking-tight">
+                  <div className="flex justify-between items-center text-xs font-bold tracking-tight">
                     <span className="font-mono">STEP {idx}</span>
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1.5">
                       {getStepIcon(step.action)}
                       {step.action}
                     </span>
                   </div>
 
-                  <div className="text-xs font-mono font-bold truncate mt-0.5" title={step.sourceCommand}>
+                  <div className="text-sm font-mono font-bold truncate mt-1" title={step.sourceCommand}>
                     {step.sourceCommand}
                   </div>
 
-                  <div className="text-[10px] opacity-80 leading-normal truncate font-sans">
+                  <div className="text-xs opacity-80 leading-normal truncate font-sans">
                     {step.status}
                   </div>
 
                   {isActive && (
-                    <div className="w-full h-1 bg-cyan-400 rounded-full mt-1.5 animate-pulse" />
+                    <div className="w-full h-1.5 bg-cyan-600 rounded-full mt-1.5 animate-pulse" />
                   )}
                 </div>
               </React.Fragment>

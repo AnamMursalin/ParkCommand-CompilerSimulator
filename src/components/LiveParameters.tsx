@@ -1,5 +1,5 @@
 import React from 'react';
-import { ToggleLeft, ToggleRight, Info, AlertTriangle, ShieldCheck, SlidersHorizontal } from 'lucide-react';
+import { ToggleLeft, ToggleRight } from 'lucide-react';
 import type { SimulationInputs } from '../compiler/simulator';
 
 interface LiveParametersProps {
@@ -20,18 +20,17 @@ export const LiveParameters: React.FC<LiveParametersProps> = ({
   onEmergencyModeToggle,
 }) => {
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl flex flex-col gap-3.5">
-      <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
-        <SlidersHorizontal className="w-5 h-5 text-cyan-400" />
-        <span className="font-bold text-slate-200 text-sm tracking-wide">Live Simulation Parameters</span>
+    <div className="bg-white border border-slate-700 rounded-xl p-6 shadow-lg flex flex-col gap-5">
+      <div className="border-b border-slate-300 pb-3">
+        <span className="font-bold text-slate-900 text-base tracking-wide">Live Simulation Parameters</span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Available Slots Slider */}
-        <div className="flex flex-col gap-1.5">
-          <div className="flex justify-between items-center text-xs">
-            <span className="text-slate-400 font-semibold">Available Slots (slots)</span>
-            <span className={`font-bold font-mono ${inputs.slotsCount > 20 ? 'text-emerald-400' : inputs.slotsCount > 0 ? 'text-yellow-400' : 'text-red-500 animate-pulse'}`}>
+        <div className="flex flex-col gap-2.5">
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-slate-700 font-semibold">Available Slots (slots)</span>
+            <span className={`font-bold font-mono text-lg ${inputs.slotsCount > 20 ? 'text-emerald-700' : inputs.slotsCount > 0 ? 'text-yellow-700' : 'text-red-700 animate-pulse'}`}>
               {inputs.slotsCount}
             </span>
           </div>
@@ -46,13 +45,13 @@ export const LiveParameters: React.FC<LiveParametersProps> = ({
                 slotsCount: parseInt(e.target.value, 10),
               })
             }
-            className="w-full accent-cyan-500 bg-slate-950 rounded-lg h-2 border border-slate-850 cursor-pointer"
+            className="w-full accent-cyan-600 bg-slate-100 rounded-lg h-3 border border-slate-300 cursor-pointer"
           />
         </div>
 
         {/* Approaching Vehicle Type */}
-        <div className="flex flex-col gap-1.5">
-          <span className="text-xs text-slate-400 font-semibold">Approaching Vehicle (vehicle)</span>
+        <div className="flex flex-col gap-2.5">
+          <span className="text-sm text-slate-700 font-semibold">Approaching Vehicle (vehicle)</span>
           <select
             value={inputs.approachingVehicle}
             onChange={(e) =>
@@ -61,7 +60,7 @@ export const LiveParameters: React.FC<LiveParametersProps> = ({
                 approachingVehicle: e.target.value,
               })
             }
-            className="bg-slate-950 border border-slate-800 text-slate-200 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-cyan-500 transition-all cursor-pointer font-mono"
+            className="bg-white border border-slate-300 text-slate-900 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-cyan-600 transition-all cursor-pointer font-mono"
           >
             <option value="visitor">Visitor (Normal Car)</option>
             <option value="staff">Staff Car</option>
@@ -73,34 +72,34 @@ export const LiveParameters: React.FC<LiveParametersProps> = ({
         </div>
 
         {/* Auto-Close Gate Toggle */}
-        <div className="flex flex-col gap-1.5 justify-center">
-          <span className="text-xs text-slate-400 font-semibold">Auto-Close Gate Protocol</span>
+        <div className="flex flex-col gap-2.5 justify-center">
+          <span className="text-sm text-slate-700 font-semibold">Auto-Close Gate Protocol</span>
           <button
             onClick={() => onAutoCloseToggle(!autoCloseGate)}
-            className="flex items-center gap-2 text-xs font-semibold py-1.5 text-left text-slate-350 focus:outline-none w-fit group"
+            className="flex items-center gap-3 text-sm font-semibold py-2.5 text-left text-slate-800 focus:outline-none w-fit group"
           >
             {autoCloseGate ? (
-              <ToggleRight className="w-7 h-7 text-emerald-400 transition-all group-hover:scale-105" />
+              <ToggleRight className="w-8 h-8 text-emerald-600 transition-all group-hover:scale-105" />
             ) : (
-              <ToggleLeft className="w-7 h-7 text-slate-600 transition-all group-hover:scale-105" />
+              <ToggleLeft className="w-8 h-8 text-slate-400 transition-all group-hover:scale-105" />
             )}
             <span>{autoCloseGate ? 'ENABLED (Close after car)' : 'DISABLED (Keep open)'}</span>
           </button>
         </div>
 
         {/* Emergency Mode Toggle */}
-        <div className="flex flex-col gap-1.5 justify-center">
-          <span className="text-xs text-slate-400 font-semibold">Emergency Mode Bypass</span>
+        <div className="flex flex-col gap-2.5 justify-center">
+          <span className="text-sm text-slate-700 font-semibold">Emergency Mode Bypass</span>
           <button
             onClick={() => onEmergencyModeToggle(!emergencyMode)}
-            className="flex items-center gap-2 text-xs font-semibold py-1.5 text-left text-slate-350 focus:outline-none w-fit group"
+            className="flex items-center gap-3 text-sm font-semibold py-2.5 text-left text-slate-800 focus:outline-none w-fit group"
           >
             {emergencyMode ? (
-              <ToggleRight className="w-7 h-7 text-red-500 transition-all group-hover:scale-105 animate-pulse" />
+              <ToggleRight className="w-8 h-8 text-red-600 transition-all group-hover:scale-105 animate-pulse" />
             ) : (
-              <ToggleLeft className="w-7 h-7 text-slate-600 transition-all group-hover:scale-105" />
+              <ToggleLeft className="w-8 h-8 text-slate-400 transition-all group-hover:scale-105" />
             )}
-            <span className={emergencyMode ? 'text-red-400 font-bold' : ''}>
+            <span className={emergencyMode ? 'text-red-700 font-bold' : ''}>
               {emergencyMode ? 'SIRENS ACTIVE' : 'SIRENS OFF'}
             </span>
           </button>

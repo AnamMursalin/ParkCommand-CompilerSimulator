@@ -2,10 +2,12 @@ import { tokenize } from './lexer';
 import { parse } from './parser';
 import { analyzeSemantics } from './semanticAnalyzer';
 import { SymbolTable } from './symbolTable';
+import { compileToIRInstructions } from './intermediateCode';
+import { optimizeIR, getOptimizationStats } from './optimizer';
 
 export interface TestResult {
   name: string;
-  phase: 'Lexer' | 'Parser' | 'Semantic';
+  phase: 'Lexer' | 'Parser' | 'Semantic' | 'Optimizer';
   status: 'Passed' | 'Failed';
   message?: string;
 }
@@ -13,7 +15,7 @@ export interface TestResult {
 export function runCompilerTests(): TestResult[] {
   const results: TestResult[] = [];
 
-  const addResult = (name: string, phase: 'Lexer' | 'Parser' | 'Semantic', passed: boolean, message?: string) => {
+  const addResult = (name: string, phase: 'Lexer' | 'Parser' | 'Semantic' | 'Optimizer', passed: boolean, message?: string) => {
     results.push({
       name,
       phase,
@@ -187,6 +189,51 @@ export function runCompilerTests(): TestResult[] {
     );
   } catch (e: any) {
     addResult('Invalid emergency category check', 'Semantic', false, e.message);
+  }
+
+  // 11. Optimization: Remove unused labels
+  try {
+    const source = 'parking TestZone begin open gate close gate end';
+    const lexResult = tokenize(source);
+    const parseResult = parse(lexResult.tokens);
+    const irOriginal = compileToIRInstructions(parseResult.ast);
+    const irOptimized = optimizeIR(irOriginal);
+    // Original shouldn't have any unused labels, so count should be same
+    const stats = getOptimizationStats(irOriginal, irOptimized);
+    const passed = stats.originalCount === stats.optimizedCount;
+    addResult(
+      'Optimizer should not change valid IR without optimizable code',
+      'Optimizer',
+      passed,
+      `Optimization stats: removed ${stats.removed} instructions (${stats.reductionPercentage}%)`
+    );
+  } catch (e: any) {
+    addResult('No-op optimization test', 'Optimizer', false, e.message);
+  }
+
+  // 12. Optimization: Get valid optimization stats
+  try {
+    const source = 'parking LoopZone begin repeat 0 times check sensor end';
+    const lexResult = tokenize(source);
+    const parseResult = parse(lexResult.tokens);
+    const table = new SymbolTable();
+    analyzeSemantics(parseResult.ast, table); // Should fail, but we still test optimizer
+    const irOriginal = compileToIRInstructions(parseResult.ast);
+    const irOptimized = optimizeIR(irOriginal);
+    const stats = getOptimizationStats(irOriginal, irOptimized);
+    const passed = 
+      typeof stats.originalCount === 'number' &&
+      typeof stats.optimizedCount === 'number' &&
+      typeof stats.removed === 'number' &&
+      typeof stats.reductionPercentage === 'number';
+    addResult(
+      'Optimizer should return valid optimization statistics',
+      'Optimizer',
+      passed,
+      `Stats: original=${stats.originalCount}, optimized=${stats.optimizedCount}, removed=${stats.removed}, reduction=${stats.reductionPercentage}%`
+    );
+  } catch (e: any) {
+    addResult('Optimization stats test', 'Optimizer', false, e.message);
   }
 
   return results;

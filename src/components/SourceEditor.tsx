@@ -91,7 +91,7 @@ export const SourceEditor: React.FC<SourceEditorProps> = ({
           <div
             key={idx}
             className={`h-5.5 leading-5.5 px-3 select-none flex whitespace-pre ${
-              isExecuting ? 'bg-cyan-500/10 border-l-2 border-cyan-400' : ''
+              isExecuting ? 'bg-cyan-900/30 border-l-2 border-cyan-400' : ''
             }`}
           >
             <span className="text-slate-500 italic">{lineText}</span>
@@ -124,17 +124,17 @@ export const SourceEditor: React.FC<SourceEditorProps> = ({
         if (/^\d+$/.test(match)) {
           return `<span class="text-yellow-400 font-bold">${match}</span>`;
         }
-        return match;
+        return `<span class="text-slate-200">${match}</span>`;
       });
 
       return (
         <div
           key={idx}
-          className={`h-5.5 leading-5.5 px-3 whitespace-pre flex border-l-2 transition-all duration-300 ${
-            isExecuting 
-              ? 'bg-cyan-500/15 border-cyan-400 text-cyan-200' 
-              : hasError 
-              ? 'bg-red-950/20 border-red-500/50'
+          className={`h-5.5 leading-5.5 px-3 whitespace-pre flex border-l-2 transition-all duration-300 text-slate-200 ${
+            isExecuting
+              ? 'bg-cyan-900/30 border-cyan-400'
+              : hasError
+              ? 'bg-red-900/30 border-red-400'
               : 'border-transparent'
           }`}
           dangerouslySetInnerHTML={{ __html: html || ' ' }}
@@ -144,17 +144,17 @@ export const SourceEditor: React.FC<SourceEditorProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-900 border border-slate-700/60 rounded-xl overflow-hidden shadow-2xl">
+    <div className="flex flex-col h-full bg-black border border-slate-700 rounded-xl overflow-hidden shadow-lg">
       {/* Editor Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-3 bg-slate-950 border-b border-slate-700/60">
+      <div className="flex flex-wrap items-center justify-between gap-4 p-3 bg-slate-900 border-b border-slate-700">
         <div className="flex items-center gap-2">
-          <Terminal className="w-5 h-5 text-cyan-400" />
-          <span className="font-semibold text-slate-200 tracking-wide text-sm">ParkCommand IDE</span>
+          <Terminal className="w-5 h-5 text-green-400" />
+          <span className="font-semibold text-green-400 tracking-wide text-sm">ParkCommand IDE</span>
         </div>
         
         <div className="flex gap-2">
           <select
-            className="text-xs bg-slate-900 text-slate-300 border border-slate-800 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-cyan-500 transition-all cursor-pointer"
+            className="text-xs bg-slate-800 text-slate-200 border border-slate-700 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-green-500 transition-all cursor-pointer"
             onChange={(e) => {
               const val = e.target.value;
               if (!val) return;
@@ -174,7 +174,7 @@ export const SourceEditor: React.FC<SourceEditorProps> = ({
           </select>
 
           <select
-            className="text-xs bg-slate-900 text-slate-300 border border-slate-800 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-cyan-500 transition-all cursor-pointer"
+            className="text-xs bg-slate-800 text-slate-200 border border-slate-700 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-green-500 transition-all cursor-pointer"
             onChange={(e) => {
               const val = e.target.value;
               if (!val) return;
@@ -196,9 +196,9 @@ export const SourceEditor: React.FC<SourceEditorProps> = ({
       </div>
 
       {/* Editor Body */}
-      <div className="flex flex-1 overflow-hidden font-mono text-sm relative bg-slate-950">
+      <div className="flex flex-1 overflow-hidden font-mono text-sm relative bg-black">
         {/* Line Numbers Gutter */}
-        <div className="flex flex-col select-none text-right text-slate-600 bg-slate-950 border-r border-slate-900 p-2 pt-4 w-12 gap-[1px] overflow-hidden">
+        <div className="flex flex-col select-none text-right text-slate-500 bg-slate-900 border-r border-slate-700 p-2 pt-4 w-12 gap-[1px] overflow-hidden">
           {lines.map((_, i) => {
             const err = getLineError(i + 1);
             const isExecuting = executingLine === (i + 1);
@@ -207,14 +207,14 @@ export const SourceEditor: React.FC<SourceEditorProps> = ({
                 key={i}
                 className={`h-5.5 leading-5.5 text-xs pr-1.5 flex items-center justify-end font-bold select-none ${
                   isExecuting 
-                    ? 'text-cyan-400 bg-cyan-950/40 rounded px-1' 
+                    ? 'text-cyan-400 bg-cyan-900/30 rounded px-1' 
                     : err 
-                    ? 'text-red-500 bg-red-950/20 rounded px-1' 
+                    ? 'text-red-400 bg-red-900/30 rounded px-1' 
                     : ''
                 }`}
                 title={err?.message}
               >
-                {err ? <AlertTriangle className="w-3 h-3 text-red-500 mr-1 animate-pulse" /> : null}
+                {err ? <AlertTriangle className="w-3 h-3 text-red-400 mr-1 animate-pulse" /> : null}
                 {i + 1}
               </div>
             );
@@ -245,7 +245,7 @@ export const SourceEditor: React.FC<SourceEditorProps> = ({
             onClick={handleCursorMove}
             onScroll={handleScroll}
             onKeyDown={handleKeyDown}
-            className="absolute inset-0 p-2 pt-4 w-full h-full bg-transparent text-transparent caret-cyan-400 resize-none focus:outline-none overflow-auto font-mono text-sm selection:bg-cyan-500/20"
+            className="absolute inset-0 p-2 pt-4 w-full h-full bg-transparent text-transparent caret-green-400 resize-none focus:outline-none overflow-auto font-mono text-sm selection:bg-green-900/50"
             placeholder="# Enter your ParkCommand compiler script..."
             spellCheck={false}
             style={{
@@ -257,7 +257,7 @@ export const SourceEditor: React.FC<SourceEditorProps> = ({
       </div>
 
       {/* Editor Footer Status Gutter */}
-      <div className="flex justify-between items-center px-4 py-2 bg-slate-950 border-t border-slate-900 text-xs text-slate-500 font-mono">
+      <div className="flex justify-between items-center px-4 py-2 bg-slate-900 border-t border-slate-700 text-xs text-slate-400 font-mono">
         <div>
           Line {cursorPos.line}, Col {cursorPos.col} | <span className="text-[10px] text-slate-500 font-sans">(Press Ctrl+Enter to Compile)</span>
         </div>
@@ -279,10 +279,10 @@ export const SourceEditor: React.FC<SourceEditorProps> = ({
       </div>
 
       {/* Compiler Actions Panel */}
-      <div className="grid grid-cols-2 md:grid-cols-5 border-t border-slate-800 bg-slate-950 p-2 gap-2">
+      <div className="grid grid-cols-2 md:grid-cols-5 border-t border-slate-700 bg-slate-900 p-2 gap-2">
         <button
           onClick={onCompile}
-          className="flex items-center justify-center gap-2 py-2 px-3 bg-cyan-600 hover:bg-cyan-500 active:bg-cyan-700 text-white rounded-lg text-sm font-semibold transition-all shadow-md focus:ring-2 focus:ring-cyan-500/50"
+          className="flex items-center justify-center gap-2 py-2 px-3 bg-cyan-700 hover:bg-cyan-600 active:bg-cyan-800 text-white rounded-lg text-sm font-semibold transition-all shadow-sm focus:ring-2 focus:ring-cyan-500/30"
         >
           <Code className="w-4 h-4" />
           Compile
@@ -291,10 +291,10 @@ export const SourceEditor: React.FC<SourceEditorProps> = ({
         <button
           onClick={onRunSimulation}
           disabled={!isCompiled}
-          className={`flex items-center justify-center gap-2 py-2 px-3 text-white rounded-lg text-sm font-semibold transition-all shadow-md ${
+          className={`flex items-center justify-center gap-2 py-2 px-3 text-white rounded-lg text-sm font-semibold transition-all shadow-sm ${
             isCompiled
-              ? 'bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 focus:ring-2 focus:ring-emerald-500/50'
-              : 'bg-slate-800/40 text-slate-600 cursor-not-allowed border border-slate-800/30'
+              ? 'bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 focus:ring-2 focus:ring-emerald-500/30'
+              : 'bg-slate-700 text-slate-500 cursor-not-allowed border border-slate-600'
           }`}
         >
           <Play className="w-4 h-4" />
@@ -304,10 +304,10 @@ export const SourceEditor: React.FC<SourceEditorProps> = ({
         <button
           onClick={onPauseSimulation}
           disabled={!isCompiled || !isSimulating}
-          className={`flex items-center justify-center gap-2 py-2 px-3 text-white rounded-lg text-sm font-semibold transition-all shadow-md ${
+          className={`flex items-center justify-center gap-2 py-2 px-3 text-white rounded-lg text-sm font-semibold transition-all shadow-sm ${
             isCompiled && isSimulating
-              ? 'bg-orange-600 hover:bg-orange-500 active:bg-orange-700 focus:ring-2 focus:ring-orange-500/50'
-              : 'bg-slate-800/40 text-slate-600 cursor-not-allowed border border-slate-800/30'
+              ? 'bg-orange-700 hover:bg-orange-600 active:bg-orange-800 focus:ring-2 focus:ring-orange-500/30'
+              : 'bg-slate-700 text-slate-500 cursor-not-allowed border border-slate-600'
           }`}
         >
           <Pause className="w-4 h-4" />
@@ -317,10 +317,10 @@ export const SourceEditor: React.FC<SourceEditorProps> = ({
         <button
           onClick={onStepSimulation}
           disabled={!isCompiled || isSimulating || (simulationStep >= totalSteps - 1 && totalSteps > 0)}
-          className={`flex items-center justify-center gap-2 py-2 px-3 text-white rounded-lg text-sm font-semibold transition-all shadow-md ${
+          className={`flex items-center justify-center gap-2 py-2 px-3 text-white rounded-lg text-sm font-semibold transition-all shadow-sm ${
             isCompiled && !isSimulating && !(simulationStep >= totalSteps - 1 && totalSteps > 0)
-              ? 'bg-amber-600 hover:bg-amber-500 active:bg-amber-700 focus:ring-2 focus:ring-amber-500/50'
-              : 'bg-slate-800/40 text-slate-600 cursor-not-allowed border border-slate-800/30'
+              ? 'bg-amber-700 hover:bg-amber-600 active:bg-amber-800 focus:ring-2 focus:ring-amber-500/30'
+              : 'bg-slate-700 text-slate-500 cursor-not-allowed border border-slate-600'
           }`}
         >
           <SkipForward className="w-4 h-4" />
@@ -329,7 +329,7 @@ export const SourceEditor: React.FC<SourceEditorProps> = ({
 
         <button
           onClick={onResetSimulation}
-          className="flex items-center justify-center gap-2 py-2 px-3 bg-slate-800 hover:bg-slate-700 active:bg-slate-900 border border-slate-700 text-slate-350 rounded-lg text-sm font-semibold transition-all col-span-2 md:col-span-1"
+          className="flex items-center justify-center gap-2 py-2 px-3 bg-slate-700 hover:bg-slate-600 active:bg-slate-800 border border-slate-600 text-slate-300 rounded-lg text-sm font-semibold transition-all col-span-2 md:col-span-1"
         >
           <RotateCcw className="w-4 h-4" />
           Reset

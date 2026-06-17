@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Sparkles } from 'lucide-react';
 import { tokenize } from './compiler/lexer';
 import { parse } from './compiler/parser';
 import { analyzeSemantics } from './compiler/semanticAnalyzer';
@@ -269,18 +268,15 @@ function App() {
   const executingLine = currentStep ? currentStep.sourceLine : null;
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-cyan-500/20">
+    <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-cyan-100 text-base">
       {/* Title Header Bar */}
-      <header className="bg-slate-900 border-b border-slate-800 p-4 shadow-md sticky top-0 z-50">
+      <header className="bg-white border-b border-slate-700 p-8 shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-cyan-400" />
-              <h1 className="text-xl md:text-2xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 via-teal-400 to-indigo-400 bg-clip-text text-transparent">
-                ParkCommand Compiler Simulator
-              </h1>
-            </div>
-            <p className="text-xs text-slate-400 font-medium mt-1">
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-blue-800">
+              ParkCommand Compiler Simulator
+            </h1>
+            <p className="text-lg text-slate-600 font-medium mt-3">
               Smart Parking Control Language with Compiler Phases and Animated Execution
             </p>
           </div>
@@ -288,9 +284,9 @@ function App() {
       </header>
 
       {/* Main Workspace */}
-      <main className="max-w-7xl mx-auto p-4 flex-1 w-full flex flex-col gap-4">
-        {/* Compiler Status bar progress tracker & Metrics Panel in Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+      <main className="max-w-7xl mx-auto p-8 flex-1 w-full flex flex-col gap-8">
+        {/* Compiler Status bar progress tracker & Metrics Panel - Vertical Stack */}
+        <div className="flex flex-col gap-8">
           <CompilerStatusBar
             compileState={compileState}
             failedPhase={failedPhase}
@@ -316,9 +312,9 @@ function App() {
         />
 
         {/* Dual Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-stretch">
           {/* Left Column: Code Editor */}
-          <div className="lg:col-span-2 flex flex-col h-[520px] lg:h-auto">
+          <div className="lg:col-span-2 flex flex-col h-[600px] lg:h-auto">
             <SourceEditor
               code={code}
               onChange={handleCodeChange}
@@ -337,9 +333,9 @@ function App() {
           </div>
 
           {/* Right Column: Visual Arena & Tabbed views */}
-          <div className="lg:col-span-3 flex flex-col gap-4">
+          <div className="lg:col-span-3 flex flex-col gap-8">
             {/* Top-Down Parking Animation Scene */}
-            <div className="h-[380px]">
+            <div className="h-[460px]">
               <ParkingSimulation
                 currentStep={currentStep}
                 slotsCount={inputs.slotsCount}
@@ -355,80 +351,80 @@ function App() {
             />
 
             {/* Compiled tabs view panel */}
-            <div className="flex-1 flex flex-col bg-slate-900 border border-slate-700/60 rounded-xl overflow-hidden shadow-2xl min-h-[300px]">
+            <div className="flex-1 flex flex-col bg-white border border-slate-700 rounded-xl overflow-hidden shadow-lg min-h-[380px]">
               {/* Tab Selector */}
-              <div className="flex flex-wrap border-b border-slate-800 bg-slate-950 p-1">
+              <div className="flex flex-wrap border-b border-slate-700 bg-slate-50 p-3 gap-2">
                 <button
                   onClick={() => setActiveTab('ir')}
-                  className={`px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
-                    activeTab === 'ir'
-                      ? 'bg-slate-800 text-purple-400 border-b border-purple-500'
-                      : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                  className={`px-5 py-3 text-sm font-bold uppercase tracking-wider rounded-lg transition-all ${
+                  activeTab === 'ir'
+                    ? 'bg-white text-purple-700 shadow-sm'
+                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
                   IR Code
                 </button>
                 <button
                   onClick={() => setActiveTab('log')}
-                  className={`px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
-                    activeTab === 'log'
-                      ? 'bg-slate-800 text-cyan-400 border-b border-cyan-500'
-                      : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                  className={`px-5 py-3 text-sm font-bold uppercase tracking-wider rounded-lg transition-all ${
+                  activeTab === 'log'
+                    ? 'bg-white text-cyan-700 shadow-sm'
+                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
                   Simulation Log
                 </button>
                 <button
                   onClick={() => setActiveTab('tokens')}
-                  className={`px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
-                    activeTab === 'tokens'
-                      ? 'bg-slate-800 text-blue-400 border-b border-blue-500'
-                      : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                  className={`px-5 py-3 text-sm font-bold uppercase tracking-wider rounded-lg transition-all ${
+                  activeTab === 'tokens'
+                    ? 'bg-white text-blue-700 shadow-sm'
+                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
                   Tokens
                 </button>
                 <button
                   onClick={() => setActiveTab('ast')}
-                  className={`px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
-                    activeTab === 'ast'
-                      ? 'bg-slate-800 text-yellow-400 border-b border-yellow-500'
-                      : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                  className={`px-5 py-3 text-sm font-bold uppercase tracking-wider rounded-lg transition-all ${
+                  activeTab === 'ast'
+                    ? 'bg-white text-yellow-700 shadow-sm'
+                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
                   Parse Tree
                 </button>
                 <button
                   onClick={() => setActiveTab('symbol')}
-                  className={`px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
-                    activeTab === 'symbol'
-                      ? 'bg-slate-800 text-indigo-400 border-b border-indigo-500'
-                      : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                  className={`px-5 py-3 text-sm font-bold uppercase tracking-wider rounded-lg transition-all ${
+                  activeTab === 'symbol'
+                    ? 'bg-white text-indigo-700 shadow-sm'
+                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
                   Symbol Table
                 </button>
                  <button
                   onClick={() => setActiveTab('errors')}
-                  className={`px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all relative ${
-                    activeTab === 'errors'
-                      ? 'bg-slate-800 text-rose-500 border-b border-rose-500'
-                      : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                  className={`px-5 py-3 text-sm font-bold uppercase tracking-wider rounded-lg transition-all relative ${
+                  activeTab === 'errors'
+                    ? 'bg-white text-rose-700 shadow-sm'
+                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
                   Diagnostics
                   {errors.length > 0 && (
-                    <span className="absolute -top-1.5 -right-1 px-1.5 py-0.25 bg-rose-600 text-[9px] font-bold text-white rounded-full animate-bounce">
+                    <span className="absolute -top-2 -right-2 px-2 py-1 bg-rose-600 text-xs font-bold text-white rounded-full animate-bounce">
                       {errors.length}
                     </span>
                   )}
                 </button>
                 <button
                   onClick={() => setActiveTab('tests')}
-                  className={`px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
-                    activeTab === 'tests'
-                      ? 'bg-slate-800 text-emerald-400 border-b border-emerald-500'
-                      : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                  className={`px-5 py-3 text-sm font-bold uppercase tracking-wider rounded-lg transition-all ${
+                  activeTab === 'tests'
+                    ? 'bg-white text-emerald-700 shadow-sm'
+                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
                   Unit Tests
@@ -436,7 +432,7 @@ function App() {
               </div>
 
               {/* Tab Contents */}
-              <div className="p-3 bg-slate-900/60 flex-1 overflow-auto max-h-[300px]">
+              <div className="p-6 bg-white flex-1 overflow-auto max-h-[380px]">
                 {activeTab === 'tokens' && <TokenTable tokens={tokens} />}
                 {activeTab === 'ast' && <ParseTreeView ast={ast} />}
                 {activeTab === 'symbol' && <SymbolTableView symbolTable={symbolTableMirror} />}

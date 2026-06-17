@@ -3,6 +3,7 @@ import { parse } from './parser';
 import { analyzeSemantics } from './semanticAnalyzer';
 import { SymbolTable } from './symbolTable';
 import { compileToIRInstructions, ResolvedIRInstruction } from './intermediateCode';
+import { optimizeIR } from './optimizer';
 import { CompilerError } from './errors';
 import { ProgramNode } from './ast';
 
@@ -58,6 +59,11 @@ export function compileProgram(code: string): CompileResult {
   // Phase 4: Intermediate Code Generation
   if (parseResult.ast) {
     result.irInstructions = compileToIRInstructions(parseResult.ast);
+  }
+
+  // Phase 5: Code Optimization
+  if (result.irInstructions.length > 0) {
+    result.irInstructions = optimizeIR(result.irInstructions);
     result.ir = result.irInstructions.map(i => i.text);
   }
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, Info, Radio, Settings, Power } from 'lucide-react';
+import { ShieldAlert, Info, Radio, Power } from 'lucide-react';
 import type { SimulationStep } from '../compiler/simulator';
 
 interface ParkingSimulationProps {
@@ -161,25 +161,24 @@ export const ParkingSimulation: React.FC<ParkingSimulationProps> = ({
   const totalUnavailableSlotsCount = reservedSlots.length + Object.keys(occupiedSlots).length;
 
   return (
-    <div className="flex flex-col h-full bg-slate-900 border border-slate-700/60 rounded-xl overflow-hidden shadow-2xl relative">
+    <div className="flex flex-col h-full bg-white border border-slate-700 rounded-xl overflow-hidden shadow-xl relative">
       {/* Simulation Header */}
-      <div className="flex items-center justify-between p-3 bg-slate-950 border-b border-slate-700/60">
-        <div className="flex items-center gap-2">
-          <Settings className="w-5 h-5 text-cyan-400" />
-          <span className="font-semibold text-slate-200 tracking-wide text-sm">Real-Time Parking Simulation</span>
+      <div className="flex items-center justify-between p-4 bg-slate-50 border-b border-slate-300">
+        <div className="flex items-center gap-3">
+          <span className="font-semibold text-slate-900 tracking-wide text-base">Real-Time Parking Simulation</span>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Gate status:</span>
-            <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider ${
-              gateState === 'open' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-600 font-bold uppercase tracking-wider">Gate status:</span>
+            <span className={`px-3 py-1 rounded text-xs font-extrabold uppercase tracking-wider ${
+              gateState === 'open' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
             }`}>
               {gateState.toUpperCase()}
             </span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Occupancy:</span>
-            <span className="font-bold text-xs text-cyan-400 font-mono">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-600 font-bold uppercase tracking-wider">Occupancy:</span>
+            <span className="font-bold text-sm text-cyan-800 font-mono">
               {6 - totalUnavailableSlotsCount} / 6 FREE
             </span>
           </div>
@@ -187,44 +186,44 @@ export const ParkingSimulation: React.FC<ParkingSimulationProps> = ({
       </div>
 
       {/* Main Simulation View Area */}
-      <div className="flex-1 bg-slate-950 p-4 min-h-[350px] relative flex flex-col justify-between overflow-hidden">
+      <div className="flex-1 bg-white p-5 min-h-[400px] relative flex flex-col justify-between overflow-hidden">
         {/* Emergency Override Siren Flasher */}
         {(emergencyActive || emergencyMode) && (
-          <div className="absolute inset-0 bg-red-500/5 pointer-events-none z-20 flex flex-col justify-between p-1.5 border border-red-500/20 animate-pulse">
-            <div className="bg-red-600/90 text-white font-bold text-xs py-1 px-4 rounded-lg flex items-center justify-between shadow-lg border border-red-400">
-              <span className="flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 animate-bounce" />
+          <div className="absolute inset-0 bg-red-100/40 pointer-events-none z-20 flex flex-col justify-between p-3 border border-red-400 animate-pulse">
+            <div className="bg-red-700 text-white font-bold text-sm py-2 px-6 rounded-lg flex items-center justify-between shadow-lg border border-red-500">
+              <span className="flex items-center gap-3">
+                <ShieldAlert className="w-5 h-5 animate-bounce" />
                 EMERGENCY SIRENS ACTIVE — GATE BARRIER BYPASSED
               </span>
-              <span className="text-[10px] animate-pulse">SIRENS FLASHING 🚨</span>
+              <span className="text-xs animate-pulse">SIRENS FLASHING 🚨</span>
             </div>
           </div>
         )}
 
         {/* Condition Check Overlay Popup */}
         {isCondEvaluation && (
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-35 bg-slate-900 border-2 border-cyan-500 rounded-xl p-3.5 shadow-2xl w-64 animate-in fade-in zoom-in duration-300">
-            <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs border-b border-slate-800 pb-1.5 uppercase tracking-wide">
-              <Info className="w-4 h-4" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-35 bg-white border-2 border-cyan-600 rounded-xl p-5 shadow-2xl w-80 animate-in fade-in zoom-in duration-300">
+            <div className="flex items-center gap-3 text-cyan-700 font-bold text-sm border-b border-slate-300 pb-2 uppercase tracking-wide">
+              <Info className="w-5 h-5" />
               <span>Condition Evaluated</span>
             </div>
-            <div className="flex flex-col gap-2 mt-2 font-mono text-xs text-slate-350">
+            <div className="flex flex-col gap-3 mt-3 font-mono text-sm text-slate-700">
               <div className="flex justify-between">
                 <span>slotsCount (slider):</span>
-                <span className="text-white font-bold">{slotsCount}</span>
+                <span className="text-slate-900 font-bold">{slotsCount}</span>
               </div>
               <div className="flex justify-between">
                 <span>approachingVehicle:</span>
-                <span className="text-white font-bold capitalize">{approachingVehicle}</span>
+                <span className="text-slate-900 font-bold capitalize">{approachingVehicle}</span>
               </div>
-              <div className="flex justify-between border-t border-slate-800 pt-1.5">
+              <div className="flex justify-between border-t border-slate-300 pt-3">
                 <span>Evaluated Logic:</span>
-                <span className="text-cyan-400 font-bold">{currentStep?.sourceCommand.replace('then ...', '')}</span>
+                <span className="text-cyan-700 font-bold">{currentStep?.sourceCommand.replace('then ...', '')}</span>
               </div>
-              <div className="flex justify-between items-center mt-1 py-1 px-2 rounded bg-slate-950">
+              <div className="flex justify-between items-center mt-2 py-2 px-3 rounded bg-slate-100">
                 <span>Logic Result:</span>
-                <span className={`font-bold px-1.5 py-0.5 rounded text-[10px] uppercase ${
-                  currentStep?.conditionResult === 'true' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+                <span className={`font-bold px-2 py-1 rounded text-xs uppercase ${
+                  currentStep?.conditionResult === 'true' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
                 }`}>
                   {currentStep?.conditionResult === 'true' ? 'TRUE' : 'FALSE'}
                 </span>
@@ -234,51 +233,51 @@ export const ParkingSimulation: React.FC<ParkingSimulationProps> = ({
         )}
 
         {/* Top Parking slots Grid (3 Slots) */}
-        <div className="grid grid-cols-3 gap-4 w-full">
+        <div className="grid grid-cols-3 gap-5 w-full">
           {slotsConfig.filter(s => s.row === 'top').map(slot => {
             const isReservedOnly = reservedSlots.includes(slot.id);
             const occupiedVehicleType = occupiedSlots[slot.id];
             const isOccupied = !!occupiedVehicleType;
 
-            let slotBorderClass = 'bg-slate-900/60 border-slate-800 hover:border-slate-700 text-slate-400';
+            let slotBorderClass = 'bg-slate-50 border-slate-300 hover:border-slate-400 text-slate-700';
             let statusLabel = 'FREE';
-            let labelColor = 'text-emerald-500';
+            let labelColor = 'text-emerald-700';
 
             if (isOccupied) {
-              slotBorderClass = 'bg-red-950/20 border-red-500/60 shadow-inner text-red-400';
+              slotBorderClass = 'bg-red-50 border-red-400 shadow-inner text-red-700';
               statusLabel = 'OCCUPIED';
-              labelColor = 'text-red-400';
+              labelColor = 'text-red-700';
             } else if (isReservedOnly) {
-              slotBorderClass = 'bg-amber-950/20 border-amber-500/60 shadow-inner text-amber-400';
+              slotBorderClass = 'bg-amber-50 border-amber-400 shadow-inner text-amber-700';
               statusLabel = 'RESERVED';
-              labelColor = 'text-amber-400';
+              labelColor = 'text-amber-700';
             }
 
             return (
               <div
                 key={slot.id}
-                className={`h-22 rounded-xl border-2 relative flex flex-col items-center justify-between p-2 transition-all duration-500 ${slotBorderClass}`}
+                className={`h-28 rounded-xl border-2 relative flex flex-col items-center justify-between p-3 transition-all duration-500 ${slotBorderClass}`}
               >
-                <div className="flex justify-between w-full text-[9px] font-bold font-mono">
+                <div className="flex justify-between w-full text-xs font-bold font-mono">
                   <span>{slot.label}</span>
                   <span className={labelColor}>
                     {statusLabel}
                   </span>
                 </div>
                 {/* Yellow parking paint lines */}
-                <div className="absolute left-0 bottom-0 top-0 w-1 bg-yellow-500/30" />
-                <div className="absolute right-0 bottom-0 top-0 w-1 bg-yellow-500/30" />
+                <div className="absolute left-0 bottom-0 top-0 w-1.5 bg-yellow-400/50" />
+                <div className="absolute right-0 bottom-0 top-0 w-1.5 bg-yellow-400/50" />
 
                 {isOccupied ? (
-                  <div className="w-14 h-7 relative animate-fade-in">
+                  <div className="w-16 h-8 relative animate-fade-in">
                     {renderTopDownCar(occupiedVehicleType, true)}
                   </div>
                 ) : isReservedOnly ? (
-                  <span className="text-[9px] px-2 py-0.5 rounded border border-amber-800/80 bg-amber-950/60 text-amber-450 font-bold uppercase tracking-wider my-auto">
+                  <span className="text-xs px-3 py-1 rounded border border-amber-400 bg-amber-100 text-amber-800 font-bold uppercase tracking-wider my-auto">
                     Reserved
                   </span>
                 ) : (
-                  <span className="text-[8px] tracking-wider uppercase font-bold text-slate-600 my-auto">Available</span>
+                  <span className="text-xs tracking-wider uppercase font-bold text-slate-500 my-auto">Available</span>
                 )}
               </div>
             );
@@ -286,50 +285,50 @@ export const ParkingSimulation: React.FC<ParkingSimulationProps> = ({
         </div>
 
         {/* Main Roadway Center Strip */}
-        <div className="relative h-44 bg-slate-900 rounded-2xl border-y-4 border-slate-800 flex items-center shadow-inner my-4">
+        <div className="relative h-52 bg-slate-100 rounded-2xl border-y-4 border-slate-300 flex items-center shadow-inner my-5">
           {/* Yellow Dashed Center Line */}
-          <div className="absolute left-0 right-0 h-0.5 border-t-2 border-dashed border-yellow-500/40 top-1/2 -translate-y-1/2" />
+          <div className="absolute left-0 right-0 h-1 border-t-2 border-dashed border-yellow-400/70 top-1/2 -translate-y-1/2" />
           
           {/* Lane marking text labels */}
-          <span className="absolute left-4 top-2 text-[9px] text-slate-600 font-extrabold uppercase font-mono tracking-wider">ENTRANCE ROAD →</span>
-          <span className="absolute right-4 bottom-2 text-[9px] text-slate-600 font-extrabold uppercase font-mono tracking-wider">← EXIT ROAD</span>
+          <span className="absolute left-6 top-3 text-xs text-slate-600 font-extrabold uppercase font-mono tracking-wider">ENTRANCE ROAD →</span>
+          <span className="absolute right-6 bottom-3 text-xs text-slate-600 font-extrabold uppercase font-mono tracking-wider">← EXIT ROAD</span>
 
           {/* Pulsing Radar Sensor Tower */}
           <div className="absolute left-[38%] top-1/2 -translate-y-1/2 flex flex-col items-center z-15">
             <div className="relative flex items-center justify-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                sensorBlinking ? 'bg-cyan-500/20 text-cyan-400 ring-2 ring-cyan-500' : 'bg-slate-950 border border-slate-800 text-slate-600'
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                sensorBlinking ? 'bg-cyan-100 text-cyan-700 ring-2 ring-cyan-600' : 'bg-white border border-slate-300 text-slate-500'
               }`}>
-                <Radio className="w-4 h-4" />
+                <Radio className="w-5 h-5" />
               </div>
               {/* Ripple radar waves */}
               {sensorBlinking && (
                 <>
-                  <div className="absolute w-12 h-12 rounded-full border border-cyan-400/40 animate-ping" />
-                  <div className="absolute w-16 h-16 rounded-full border border-cyan-500/20 animate-ping [animation-delay:0.3s]" />
+                  <div className="absolute w-14 h-14 rounded-full border border-cyan-500/40 animate-ping" />
+                  <div className="absolute w-20 h-20 rounded-full border border-cyan-600/20 animate-ping [animation-delay:0.3s]" />
                 </>
               )}
             </div>
-            <span className="text-[7px] text-slate-500 font-bold uppercase mt-1 font-mono">SENSOR</span>
+            <span className="text-xs text-slate-500 font-bold uppercase mt-1.5 font-mono">SENSOR</span>
           </div>
 
           {/* Traffic Light Assembly */}
-          <div className="absolute left-[54%] top-4 flex gap-1 bg-slate-950 p-1 rounded-md border border-slate-850 z-20">
+          <div className="absolute left-[54%] top-5 flex gap-1.5 bg-white p-1.5 rounded-md border border-slate-300 z-20">
             {/* Red Light */}
-            <div className={`w-3.5 h-3.5 rounded-full transition-all ${
-              gateState === 'closed' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]' : 'bg-red-950'
+            <div className={`w-4 h-4 rounded-full transition-all ${
+              gateState === 'closed' ? 'bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.9)]' : 'bg-red-100'
             }`} />
             {/* Green Light */}
-            <div className={`w-3.5 h-3.5 rounded-full transition-all ${
-              gateState === 'open' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'bg-emerald-950'
+            <div className={`w-4 h-4 rounded-full transition-all ${
+              gateState === 'open' ? 'bg-emerald-600 shadow-[0_0_10px_rgba(5,150,105,0.9)]' : 'bg-emerald-100'
             }`} />
           </div>
 
           {/* Physical Gate Barrier */}
-          <div className="absolute left-[58%] top-0 bottom-1/2 w-4 flex flex-col items-center justify-end z-25">
+          <div className="absolute left-[58%] top-0 bottom-1/2 w-5 flex flex-col items-center justify-end z-25">
             {/* Gate Box */}
-            <div className="w-5 h-7 bg-slate-700 rounded border border-slate-600 flex items-center justify-center shadow-lg relative z-30">
-              <Power className={`w-3.5 h-3.5 ${gateState === 'open' ? 'text-emerald-400' : 'text-red-400'}`} />
+            <div className="w-6 h-8 bg-slate-300 rounded border border-slate-400 flex items-center justify-center shadow-lg relative z-30">
+              <Power className={`w-4 h-4 ${gateState === 'open' ? 'text-emerald-700' : 'text-red-700'}`} />
             </div>
             
             {/* Pivoting Striped Arm */}
@@ -338,28 +337,28 @@ export const ParkingSimulation: React.FC<ParkingSimulationProps> = ({
                 transform: gateState === 'open' ? 'rotate(-85deg)' : 'rotate(0deg)',
                 transformOrigin: 'bottom right',
               }}
-              className="absolute bottom-1 right-2 w-1.5 h-18 bg-gradient-to-t from-red-500 via-white to-red-500 border border-slate-950 rounded-full transition-transform duration-500 ease-out z-20 shadow-md"
+              className="absolute bottom-1.5 right-2.5 w-2 h-20 bg-gradient-to-t from-red-600 via-white to-red-600 border border-slate-300 rounded-full transition-transform duration-500 ease-out z-20 shadow-md"
             >
               {/* Stripes decoration */}
-              <div className="w-full h-full flex flex-col justify-between py-1 opacity-70">
-                <div className="h-2 bg-red-600" />
-                <div className="h-2 bg-slate-950" />
-                <div className="h-2 bg-red-600" />
+              <div className="w-full h-full flex flex-col justify-between py-1.5 opacity-70">
+                <div className="h-3 bg-red-700" />
+                <div className="h-3 bg-slate-300" />
+                <div className="h-3 bg-red-700" />
               </div>
             </div>
           </div>
 
           {/* Exit Gate Decoration */}
-          <div className="absolute left-[24%] bottom-0 top-1/2 w-4 flex flex-col items-center justify-start z-25">
+          <div className="absolute left-[24%] bottom-0 top-1/2 w-5 flex flex-col items-center justify-start z-25">
             {/* Striped Exit Gate Arm (Always open visually) */}
             <div
               style={{
                 transform: 'rotate(85deg)',
                 transformOrigin: 'top right',
               }}
-              className="absolute top-1 right-2 w-1.5 h-18 bg-gradient-to-b from-slate-400 via-white to-slate-400 border border-slate-950 rounded-full z-20"
+              className="absolute top-1.5 right-2.5 w-2 h-20 bg-gradient-to-b from-slate-400 via-white to-slate-400 border border-slate-300 rounded-full z-20"
             />
-            <div className="w-5 h-7 bg-slate-800 rounded border border-slate-700 shadow-lg relative z-30" />
+            <div className="w-6 h-8 bg-slate-300 rounded border border-slate-400 shadow-lg relative z-30" />
           </div>
 
           {/* Animated Driving Car */}
@@ -367,55 +366,55 @@ export const ParkingSimulation: React.FC<ParkingSimulationProps> = ({
             style={{
               transition: isMoving ? 'left 0.7s ease-out, transform 0.5s, opacity 0.5s' : 'none',
             }}
-            className={`absolute top-6 w-16 h-8 z-30 ${vehiclePosClass}`}
+            className={`absolute top-7 w-20 h-10 z-30 ${vehiclePosClass}`}
           >
             {renderTopDownCar(activeVehicle)}
           </div>
         </div>
 
         {/* Bottom Parking slots Grid (3 Slots) */}
-        <div className="grid grid-cols-3 gap-4 w-full">
+        <div className="grid grid-cols-3 gap-5 w-full">
           {slotsConfig.filter(s => s.row === 'bottom').map(slot => {
             const isReservedOnly = reservedSlots.includes(slot.id);
             const occupiedVehicleType = occupiedSlots[slot.id];
             const isOccupied = !!occupiedVehicleType;
 
-            let slotBorderClass = 'bg-slate-900/60 border-slate-800 hover:border-slate-700 text-slate-400';
+            let slotBorderClass = 'bg-slate-50 border-slate-300 hover:border-slate-400 text-slate-700';
             let statusLabel = 'FREE';
-            let labelColor = 'text-emerald-500';
+            let labelColor = 'text-emerald-700';
 
             if (isOccupied) {
-              slotBorderClass = 'bg-red-950/20 border-red-500/60 shadow-inner text-red-400';
+              slotBorderClass = 'bg-red-50 border-red-400 shadow-inner text-red-700';
               statusLabel = 'OCCUPIED';
-              labelColor = 'text-red-400';
+              labelColor = 'text-red-700';
             } else if (isReservedOnly) {
-              slotBorderClass = 'bg-amber-950/20 border-amber-500/60 shadow-inner text-amber-400';
+              slotBorderClass = 'bg-amber-50 border-amber-400 shadow-inner text-amber-700';
               statusLabel = 'RESERVED';
-              labelColor = 'text-amber-400';
+              labelColor = 'text-amber-700';
             }
 
             return (
               <div
                 key={slot.id}
-                className={`h-22 rounded-xl border-2 relative flex flex-col items-center justify-between p-2 transition-all duration-500 ${slotBorderClass}`}
+                className={`h-28 rounded-xl border-2 relative flex flex-col items-center justify-between p-3 transition-all duration-500 ${slotBorderClass}`}
               >
                 {/* Yellow parking paint lines */}
-                <div className="absolute left-0 bottom-0 top-0 w-1 bg-yellow-500/30" />
-                <div className="absolute right-0 bottom-0 top-0 w-1 bg-yellow-500/30" />
+                <div className="absolute left-0 bottom-0 top-0 w-1.5 bg-yellow-400/50" />
+                <div className="absolute right-0 bottom-0 top-0 w-1.5 bg-yellow-400/50" />
 
                 {isOccupied ? (
-                  <div className="w-14 h-7 relative animate-fade-in">
+                  <div className="w-16 h-8 relative animate-fade-in">
                     {renderTopDownCar(occupiedVehicleType, true)}
                   </div>
                 ) : isReservedOnly ? (
-                  <span className="text-[9px] px-2 py-0.5 rounded border border-amber-800/80 bg-amber-950/60 text-amber-450 font-bold uppercase tracking-wider my-auto">
+                  <span className="text-xs px-3 py-1 rounded border border-amber-400 bg-amber-100 text-amber-800 font-bold uppercase tracking-wider my-auto">
                     Reserved
                   </span>
                 ) : (
-                  <span className="text-[8px] tracking-wider uppercase font-bold text-slate-600 my-auto">Available</span>
+                  <span className="text-xs tracking-wider uppercase font-bold text-slate-500 my-auto">Available</span>
                 )}
 
-                <div className="flex justify-between w-full text-[9px] font-bold font-mono">
+                <div className="flex justify-between w-full text-xs font-bold font-mono">
                   <span>{slot.label}</span>
                   <span className={labelColor}>
                     {statusLabel}
